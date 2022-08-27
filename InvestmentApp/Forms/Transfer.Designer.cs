@@ -1,5 +1,6 @@
 ﻿using Syncfusion.Windows.Forms;
 using Syncfusion.WinForms.DataGrid;
+using Syncfusion.WinForms.Input.Enums;
 using System.Windows.Forms;
 
 namespace InvestmentApp.Forms
@@ -70,8 +71,8 @@ namespace InvestmentApp.Forms
             this.sfdgMoneyTransferOperations = new Syncfusion.WinForms.DataGrid.SfDataGrid();
             this.lblProcess = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.bankAccountBindingSourceSender = new System.Windows.Forms.BindingSource(this.components);
             this.moneyTransferDtoBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.bankAccountBindingSourceSender = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.sfcbxTargetUsers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.userDtoBindingSourceTarget)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbxAmount)).BeginInit();
@@ -85,8 +86,8 @@ namespace InvestmentApp.Forms
             ((System.ComponentModel.ISupportInitialize)(this.tbxTargetIBAN)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbxSenderIBAN)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sfdgMoneyTransferOperations)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bankAccountBindingSourceSender)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.moneyTransferDtoBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bankAccountBindingSourceSender)).BeginInit();
             this.SuspendLayout();
             // 
             // tbxExplanation
@@ -399,18 +400,26 @@ namespace InvestmentApp.Forms
             // 
             this.sfdgMoneyTransferOperations.AccessibleName = "Table";
             this.sfdgMoneyTransferOperations.AutoSizeColumnsMode = Syncfusion.WinForms.DataGrid.Enums.AutoSizeColumnsMode.Fill;
+            gridTextColumn1.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             gridTextColumn1.HeaderText = "SENDER NAME";
             gridTextColumn1.MappingName = "SenderUser.Name";
+            gridTextColumn2.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             gridTextColumn2.HeaderText = "SENDER ACCOUNT";
             gridTextColumn2.MappingName = "SenderBankAccount.AccountName";
+            gridTextColumn3.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             gridTextColumn3.HeaderText = "CURRENCY TYPE";
             gridTextColumn3.MappingName = "CurrencyType";
+            gridTextColumn4.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridTextColumn4.Format = "Decimal";
             gridTextColumn4.HeaderText = "AMOUNT";
             gridTextColumn4.MappingName = "Amount";
+            gridTextColumn5.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             gridTextColumn5.HeaderText = "EXPLANATION";
             gridTextColumn5.MappingName = "Explanation";
+            gridTextColumn6.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             gridTextColumn6.HeaderText = "TARGET NAME";
             gridTextColumn6.MappingName = "TargetUser.Name";
+            gridTextColumn7.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             gridTextColumn7.HeaderText = "TARGET ACCOUNT";
             gridTextColumn7.MappingName = "TargetBankAccount.AccountName";
             this.sfdgMoneyTransferOperations.Columns.Add(gridTextColumn1);
@@ -426,6 +435,7 @@ namespace InvestmentApp.Forms
             this.sfdgMoneyTransferOperations.TabIndex = 45;
             this.sfdgMoneyTransferOperations.Text = "sfDataGrid1";
             this.sfdgMoneyTransferOperations.SelectionChanged += new Syncfusion.WinForms.DataGrid.Events.SelectionChangedEventHandler(this.sfdgMoneyTransferOperations_SelectionChanged);
+            this.sfdgMoneyTransferOperations.CellDoubleClick += new Syncfusion.WinForms.DataGrid.Events.CellClickEventHandler(this.sfdgMoneyTransferOperations_CellDoubleClick);
             // 
             // lblProcess
             // 
@@ -433,9 +443,9 @@ namespace InvestmentApp.Forms
             this.lblProcess.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblProcess.Location = new System.Drawing.Point(514, 194);
             this.lblProcess.Name = "lblProcess";
-            this.lblProcess.Size = new System.Drawing.Size(140, 20);
+            this.lblProcess.Size = new System.Drawing.Size(148, 20);
             this.lblProcess.TabIndex = 47;
-            this.lblProcess.Text = "PROCESSING . . .";
+            this.lblProcess.Text = "ATTRACTING 31....";
             this.lblProcess.Visible = false;
             // 
             // progressBar1
@@ -485,8 +495,8 @@ namespace InvestmentApp.Forms
             ((System.ComponentModel.ISupportInitialize)(this.tbxTargetIBAN)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbxSenderIBAN)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.sfdgMoneyTransferOperations)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bankAccountBindingSourceSender)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.moneyTransferDtoBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bankAccountBindingSourceSender)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -519,10 +529,10 @@ namespace InvestmentApp.Forms
         private Syncfusion.WinForms.DataGrid.SfDataGrid sfdgMoneyTransferOperations;
         private System.Windows.Forms.Label lblProcess;
         private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.BindingSource bankAccountBindingSourceTarget;
-        private System.Windows.Forms.BindingSource userDtoBindingSourceTarget;
-        private System.Windows.Forms.BindingSource bankAccountBindingSourceSender;
         private Syncfusion.WinForms.ListView.SfComboBox sfcbxTargetBankAccounts;
-        private System.Windows.Forms.BindingSource moneyTransferDtoBindingSource;
+        private BindingSource userDtoBindingSourceTarget;
+        private BindingSource bankAccountBindingSourceTarget;
+        private BindingSource moneyTransferDtoBindingSource;
+        private BindingSource bankAccountBindingSourceSender;
     }
 }

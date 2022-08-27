@@ -5,6 +5,7 @@ using Syncfusion.WinForms.DataGrid;
 using Syncfusion.WinForms.DataGrid.Enums;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -18,14 +19,20 @@ namespace InvestmentApp.Forms
 {
     public partial class Transfer : Form
     {
+        ObservableCollection<BankAccount> observableCollection = new ObservableCollection<BankAccount>();
         BusinessTransfer _businessTransfer = new BusinessTransfer();
         UserDto _senderUser;
         List<BankAccount> _senderBankAccounts;
         List<UserDto> _targetUsers;
         List<MoneyTransferDto> _moneyTransferList = new List<MoneyTransferDto>();
+        List<BankAccount> _targetBankAccounts = new List<BankAccount>();
+        bool _isSetTargetBankAccountsBusy = false;
+        bool _sfcbxSenderBankAccounts_SVC = false;
+        bool _sfcbxTargetUsers_SVC = false;
+        bool _sfcbxTargetBankAccounts_SVC = false;
         bool _isBusy = false;
-        public Transfer(UserDto senderUser, List<BankAccount> senderBankAccounts)
 
+        public Transfer(UserDto senderUser, List<BankAccount> senderBankAccounts)
         {
             InitializeComponent();
             _senderUser = senderUser;
@@ -54,6 +61,8 @@ namespace InvestmentApp.Forms
         {
             try
             {
+                _sfcbxSenderBankAccounts_SVC = true;
+                isProgress();
                 tbxTargetIBAN.Clear();
                 if (sfcbxSenderBankAccounts.SelectedIndex == -1)
                     return;
@@ -67,14 +76,39 @@ namespace InvestmentApp.Forms
                 }
             }
             catch (Exception ex) { }
+            finally 
+            { 
+                _sfcbxSenderBankAccounts_SVC = false;
+                isProgress();
+                label6.Text += "1";
+            }
         }
+
+        private void isProgress()
+        {
+            if (_sfcbxSenderBankAccounts_SVC || _sfcbxSenderBankAccounts_SVC || _sfcbxTargetUsers_SVC || _isSetTargetBankAccountsBusy || _sfcbxTargetBankAccounts_SVC)
+            {
+                lblProcess.Visible = true;
+                progressBar1.Visible = true;
+                this.Enabled = false;
+            }
+            else
+            {
+                lblProcess.Visible = false;
+                progressBar1.Visible = false;
+                this.Enabled = true;
+            }
+
+        }
+
         private async Task SetTargetBankAccounts(UserDto targetUser, CurrencyTypes currencyType)
         {
             try
             {
-                if (!_isBusy)
+                if (!_isSetTargetBankAccountsBusy)
                 {
-                    _isBusy = true;
+                    _isSetTargetBankAccountsBusy = true;
+                    isProgress();
                     List<BankAccount> targetBankAccounts = await _businessTransfer.GetUserBankAccounts(targetUser, currencyType);
                     if (targetBankAccounts.Count == 0)
                     {
@@ -92,12 +126,19 @@ namespace InvestmentApp.Forms
                 return;
             }
             catch (Exception ex) { }
-            finally { _isBusy = false; }
+            finally 
+            {
+                isProgress();
+                _isSetTargetBankAccountsBusy = false;
+                label6.Text += "2";
+            }
         }
         private async void sfcbxTargetUsers_SelectedValueChanged(object sender, EventArgs e)
         {
             try
             {
+                _sfcbxTargetUsers_SVC = true;
+                isProgress();
                 tbxTargetIBAN.Clear();
                 BankAccount senderBankAccount = (BankAccount)sfcbxSenderBankAccounts.SelectedItem;
                 UserDto targetUser = (UserDto)sfcbxTargetUsers.SelectedItem;
@@ -108,16 +149,20 @@ namespace InvestmentApp.Forms
                 }
             }
             catch (Exception ex) { }
+            finally { _sfcbxTargetUsers_SVC = false; isProgress(); label6.Text += "3"; }
         }
         private void sfcbxTargetBankAccounts_SelectedValueChanged(object sender, EventArgs e)
         {
             try
             {
+                _sfcbxTargetBankAccounts_SVC = true;
+                isProgress();
                 tbxTargetIBAN.Clear();
                 BankAccount targetBankAccount = (BankAccount)sfcbxTargetBankAccounts.SelectedItem;
                 tbxTargetIBAN.Text = targetBankAccount?.IBAN;
             }
             catch (Exception ex) { }
+            finally { _sfcbxTargetBankAccounts_SVC = false; isProgress(); label6.Text += "4"; }
             
         }
         private void btnAdd_Click(object sender, EventArgs e)
@@ -160,32 +205,98 @@ namespace InvestmentApp.Forms
             }
         }
 
-        private void sfdgMoneyTransferOperations_CellClick(object sender, Syncfusion.WinForms.DataGrid.Events.CellClickEventArgs e)
+
+
+
+
+
+
+
+
+
+
+
+
+        private async Task SetTargetBankAccount(MoneyTransferDto moneyTransferDto)
         {
-            MoneyTransferDto moneyTransferDto = new MoneyTransferDto();
-            moneyTransferDto = sfdgMoneyTransferOperations.SelectedItem as MoneyTransferDto;
-            tbxSenderName.Text = moneyTransferDto.SenderUser.Name;
-            sfcbxTargetUsers.SelectedItem = moneyTransferDto.TargetUser;
-            sfcbxSenderBankAccounts.SelectedItem = moneyTransferDto.SenderBankAccount;
-            sfcbxTargetBankAccounts.SelectedItem = moneyTransferDto.TargetBankAccount;
+            int trytimes = 5000;
+            while ((_sfcbxSenderBankAccounts_SVC || _sfcbxSenderBankAccounts_SVC || _sfcbxTargetUsers_SVC || _isSetTargetBankAccountsBusy || _sfcbxTargetBankAccounts_SVC) && trytimes > 0)
+            {
+                await Task.Delay(100);
+                trytimes--;
+            }
+            if (((List<BankAccount>)sfcbxTargetBankAccounts.DataSource) == null)
+            {
+                //await SetTargetBankAccount(moneyTransferDto);
+                MessageBox.Show("fucked up");
+                return;
+            }
+            sfcbxTargetBankAccounts.SelectedItem = ((List<BankAccount>)sfcbxTargetBankAccounts.DataSource).FirstOrDefault(x => x.ID == moneyTransferDto?.TargetBankAccount.ID);
+            //sfcbxTargetBankAccounts.SelectedItem = moneyTransferDto.TargetBankAccount;
         }
 
-        private void sfdgMoneyTransferOperations_SelectionChanged(object sender, Syncfusion.WinForms.DataGrid.Events.SelectionChangedEventArgs e)
+
+        private async void sfdgMoneyTransferOperations_CellDoubleClick(object sender, Syncfusion.WinForms.DataGrid.Events.CellClickEventArgs e)
+        {
+            //try
+            //{
+            //    if (!_isBusy)
+            //    {
+            //        _isBusy = true;
+            //        isProgress(1);
+            //        sfdgMoneyTransferOperations.Enabled = false;
+            //        MoneyTransferDto moneyTransferDto = new MoneyTransferDto();
+            //        moneyTransferDto = sfdgMoneyTransferOperations.SelectedItem as MoneyTransferDto;
+            //        tbxSenderName.Text = moneyTransferDto?.SenderUser.Name;
+            //        sfcbxSenderBankAccounts.SelectedItem = moneyTransferDto?.SenderBankAccount;
+            //        sfcbxTargetUsers.SelectedItem = moneyTransferDto?.TargetUser;
+
+
+            //        tbxAmount.CurrencySymbol = moneyTransferDto.SenderBankAccount.Currency.ToString();
+            //        tbxAmount.DecimalValue = moneyTransferDto.Amount;
+
+            //        await SetTargetBankAccount(moneyTransferDto);
+                    
+            //        if (_sfcbxSenderBankAccounts_SVC || _sfcbxSenderBankAccounts_SVC || _sfcbxTargetUsers_SVC || _isSetTargetBankAccountsBusy || _sfcbxTargetBankAccounts_SVC)
+            //        {
+            //            isProgress(0);
+            //        }
+            //        label6.Text += "5-";
+            //    }
+            //    return;
+            //}
+            //catch (Exception ex) { }
+            //finally { _isBusy = false; }
+        }
+
+        private async void sfdgMoneyTransferOperations_SelectionChanged(object sender, Syncfusion.WinForms.DataGrid.Events.SelectionChangedEventArgs e)
         {
             try
             {
-                MoneyTransferDto moneyTransferDto = new MoneyTransferDto();
-                moneyTransferDto = sfdgMoneyTransferOperations.SelectedItem as MoneyTransferDto;
-                tbxSenderName.Text = moneyTransferDto?.SenderUser.Name;
-                sfcbxTargetUsers.SelectedItem = moneyTransferDto?.TargetUser;
-                sfcbxSenderBankAccounts.SelectedItem = moneyTransferDto?.SenderBankAccount;
+                if (!_isBusy)
+                {
+                    _isBusy = true;
+                    isProgress();
+                    
+                    MoneyTransferDto moneyTransferDto = new MoneyTransferDto();
+                    moneyTransferDto = sfdgMoneyTransferOperations.SelectedItem as MoneyTransferDto;
+                    tbxSenderName.Text = moneyTransferDto?.SenderUser.Name;
+                    sfcbxSenderBankAccounts.SelectedItem = moneyTransferDto?.SenderBankAccount;
+                    sfcbxTargetUsers.SelectedItem = moneyTransferDto?.TargetUser;
 
-                tbxAmount.CurrencySymbol = moneyTransferDto.SenderBankAccount.Currency.ToString();
-                tbxAmount.DecimalValue = moneyTransferDto.Amount;
 
-                sfcbxTargetBankAccounts.SelectedItem = moneyTransferDto?.TargetBankAccount;
+                    tbxAmount.CurrencySymbol = moneyTransferDto.SenderBankAccount.Currency.ToString();
+                    tbxAmount.DecimalValue = moneyTransferDto.Amount;
+
+                    await SetTargetBankAccount(moneyTransferDto);
+
+                    
+                    label6.Text += "5-";
+                }
+                return;
             }
-            catch (Exception) { }
+            catch (Exception ex) { }
+            finally { _isBusy = false; isProgress(); }
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace InvestmentApp.Entities.Classes
 {
-    internal class MoneyTransferDto
+    public class MoneyTransferDto
     {
         public UserDto SenderUser { get; set; }
         public BankAccount SenderBankAccount { get; set; }
