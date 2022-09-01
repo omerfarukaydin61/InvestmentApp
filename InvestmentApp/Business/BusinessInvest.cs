@@ -25,11 +25,11 @@ namespace InvestmentApp.Business
         {
             return _repository.GetCurrencyTable();
         }
-        public Task<List<BankAccount>> GetUserBankAccounts(int id)
+        public Task<List<BankAccountDto>> GetUserBankAccounts(int id)
         {
             return _repository.GetUserBankAccounts(id);
         }
-        public Task<List<UserInvestment>> GetUserInvestmentLog(int id)
+        public Task<List<UserInvestmentDto>> GetUserInvestmentLog(int id)
         {
             return _repository.GetUserInvestmentLog(id);
         }
@@ -75,7 +75,7 @@ namespace InvestmentApp.Business
                 return 0;
             }
         }
-        public decimal CalculateTotalBalance(List<BankAccount> bankAccounts, CurrencyTypes to)
+        public decimal CalculateTotalBalance(List<BankAccountDto> bankAccounts, CurrencyTypes to)
         {
             decimal result = 0;
             if (bankAccounts != null)

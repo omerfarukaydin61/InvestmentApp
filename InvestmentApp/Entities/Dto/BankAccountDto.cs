@@ -1,5 +1,6 @@
 namespace InvestmentApp.Entities.Classes
 {
+    using InvestmentApp.Entities.EntityData;
     using InvestmentApp.Entities.Enums;
     using System;
     using System.Collections.Generic;
@@ -7,7 +8,7 @@ namespace InvestmentApp.Entities.Classes
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class BankAccount
+    public partial class BankAccountDto
     {
         public int ID { get; set; }
 

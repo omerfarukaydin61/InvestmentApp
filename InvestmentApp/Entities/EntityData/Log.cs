@@ -1,6 +1,5 @@
-namespace InvestmentApp.Entities.Classes
+namespace InvestmentApp.Entities.EntityData
 {
-    using InvestmentApp.Entities.Enums;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -17,7 +16,7 @@ namespace InvestmentApp.Entities.Classes
 
         public DateTime Date { get; set; }
 
-        public LogAction Action { get; set; }
+        public int Action { get; set; }
 
         [Required]
         public string Explanation { get; set; }

@@ -1,6 +1,5 @@
-namespace InvestmentApp.Entities.Classes
+namespace InvestmentApp.Entities.EntityData
 {
-    using InvestmentApp.Entities.Enums;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -36,7 +35,7 @@ namespace InvestmentApp.Entities.Classes
 
         public DateTime RegisterDate { get; set; }
 
-        public Permissions Permission { get; set; }
+        public int Permission { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BankAccount> BankAccounts { get; set; }

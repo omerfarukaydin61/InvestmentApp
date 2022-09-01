@@ -82,7 +82,7 @@ namespace InvestmentApp.Forms
                 Update();
             }
         }
-        private void Add()
+        private async void Add()
         {
             if (!String.IsNullOrWhiteSpace(tbxName.Text) ||
                 !String.IsNullOrWhiteSpace(tbxSurname.Text) ||
@@ -101,13 +101,13 @@ namespace InvestmentApp.Forms
                         user.RegisterDate = DateTime.Now;
                         user.Permission = (Permissions)cbxPermission.SelectedIndex;
                     }
-                    (bool isAdded, string msg) = _repository.Add(user);
+                    (bool isAdded, string msg) = await _repository.Add(user);
 
                     if (isAdded == true)
                     {
                         MessageBox.Show(msg);
                         string message = $"{ConfigModel.RegisteredUser.Name} added new user {user.Name}.";
-                        Logger.Log(LogAction.add, message, ConfigModel.RegisteredUser.ID, user.ID);
+                        await Logger.Log(LogAction.add, message, ConfigModel.RegisteredUser.ID, user.ID);
                         this.Close();
                     }
                     else
@@ -121,16 +121,16 @@ namespace InvestmentApp.Forms
                 MessageBox.Show("Please fill all the blanks !!!");
             }
         }
-        private void Delete()
+        private async void Delete()
         {
             DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this user?", "???", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
-                (bool isDeleted, string msg) = _repository.Delete(_userDto);
+                (bool isDeleted, string msg) = await _repository.Delete(_userDto);
                 if (isDeleted)
                 {
                     string message = $"{ConfigModel.RegisteredUser.Name} deleted user {tbxName.Text}.";
-                    Logger.Log(LogAction.remove, message, ConfigModel.RegisteredUser.ID, Convert.ToInt32(tbxID.Text));
+                    await Logger.Log(LogAction.remove, message, ConfigModel.RegisteredUser.ID, Convert.ToInt32(tbxID.Text));
                     MessageBox.Show(msg);
                     this.Close();
                 }
@@ -141,7 +141,7 @@ namespace InvestmentApp.Forms
                 }
             }
         }
-        private void Update()
+        private async void Update()
         {
             DialogResult dialogResult = MessageBox.Show("Are you sure you want to update this user?", "???", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
@@ -161,12 +161,12 @@ namespace InvestmentApp.Forms
                         RegisterDate = Convert.ToDateTime(tbxRegisterDate.Text),
                         Permission = (Permissions)cbxPermission.SelectedIndex
                     };
-                    (bool isUpdated, string msg) = _repository.Update(user);
+                    (bool isUpdated, string msg) = await _repository.Update(user);
                     if (isUpdated)
                     {
                         MessageBox.Show(msg);
                         string message = $"{ConfigModel.RegisteredUser.Name} updated {user.Name}'s informations.";
-                        Logger.Log(LogAction.update, message, ConfigModel.RegisteredUser.ID, user.ID);
+                        await Logger.Log(LogAction.update, message, ConfigModel.RegisteredUser.ID, user.ID);
                         this.Close();
                     }
                     else

@@ -1,5 +1,6 @@
 ﻿using InvestmentApp.Entities;
 using InvestmentApp.Entities.Classes;
+using InvestmentApp.Entities.EntityData;
 using InvestmentApp.Entities.Enums;
 using System;
 using System.Collections.Generic;
@@ -23,32 +24,32 @@ namespace InvestmentApp
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public bool Login(string username, string password)
+        public async Task<bool> Login(string username, string password)
         {
             try
             {
-                UserTable userTable = _context.UserTables.FirstOrDefault(x => x.Username == username && x.Password == password);
+                UserTable userTable = await _context.UserTables.FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
                 if (userTable != null)
                 {
-                    ConfigModel.RegisteredUser = userTable.CastUserTableToUserDto();
+                    ConfigModel.RegisteredUser = userTable.CastUserTableToDto();
                     return true;
                 }
                 return false;
             }
             catch (Exception ex)
             {
-                Logger.ExeptionLog(ex);
+                await Logger.ExeptionLog(ex);
                 return false;
             }
         }
-        public (bool, string) Add(UserDto user)
+        public async Task<(bool, string)> Add(UserDto user)
         {
             try
             {
                 if (!_context.UserTables.Any(x => x.Username == user.Username))
                 {
-                    _context.UserTables.Add(user.CastUserDtoToUserTable());
-                    _context.SaveChanges();
+                    _context.UserTables.Add(user.CastDtoToUserTable());
+                    await _context.SaveChangesAsync();
                     return (true, "User added successfully");
                 }
                 else
@@ -58,19 +59,19 @@ namespace InvestmentApp
             }
             catch (Exception ex)
             {
-                Logger.ExeptionLog(ex);
+                await Logger.ExeptionLog(ex);
                 return (false, ex.Message);
             }
         }
-        public (bool, string) Delete(UserDto user)
+        public async Task<(bool, string)> Delete(UserDto user)
         {
             try
             {
                 if (ConfigModel.RegisteredUser.ID != user.ID)
                 {
-                    var entity = _context.Entry(user.CastUserDtoToUserTable());
+                    var entity = _context.Entry(user.CastDtoToUserTable());
                     entity.State = EntityState.Deleted;
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return (true, "User deleted");
                 }
                 else
@@ -80,112 +81,53 @@ namespace InvestmentApp
             }
             catch (Exception ex)
             {
-                Logger.ExeptionLog(ex);
+                await Logger.ExeptionLog(ex);
                 return (false, ex.Message);
             }
         }
-        public (bool, string) Update(UserDto user)
+        public async Task<(bool, string)> Update(UserDto user)
         {
             try
             {
-                var entity = _context.Entry(user.CastUserDtoToUserTable());
+                var entity = _context.Entry(user.CastDtoToUserTable());
                 entity.State = EntityState.Modified;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return (true, "User's informations updated successfully");
             }
             catch (Exception ex)
             {
-                Logger.ExeptionLog(ex);
+                await Logger.ExeptionLog(ex);
                 return (false, ex.Message);
             }
         }
-        public (bool, string) ttTransfer(BankAccount senderBankAccount, BankAccount targetBankAccount, decimal amount)
+        public async Task<(bool, string)> Transfer(BankAccountDto senderBankAccount, BankAccountDto targetBankAccount, string explanation, decimal amount)
         {
-            try
+            using (InvestmentDbContext context = new InvestmentDbContext())
             {
-                if (senderBankAccount.Currency == targetBankAccount.Currency)
+                try
                 {
-                    if (senderBankAccount.Balance >= amount)
+                    if (senderBankAccount.ID != targetBankAccount.ID)
                     {
-                        senderBankAccount.Balance -= amount;
-                        targetBankAccount.Balance += amount;
-
-                        _context.Entry(senderBankAccount).State = EntityState.Modified;
-                        _context.Entry(targetBankAccount).State = EntityState.Modified;
-                        _context.SaveChanges();
-
-                        return (true, "Transfer successful");
-                    }
-                    return (false, "Insufficient balance");
-                }
-                return (false, "Your account' s currency type and target account' s currency type does not match");
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message);
-            }
-        }
-        public (bool, string) Transfer(int senderId, string senderIBAN, int targetId, string targetIBAN, CurrencyTypes currencyType, decimal amount)
-        {
-            try
-            {
-                BankAccount senderBankAccount = _context.BankAccounts.FirstOrDefault(x => x.UserId == senderId && x.IBAN == senderIBAN);
-                if (senderBankAccount != null)
-                {
-                    if (senderBankAccount.Currency == currencyType)
-                    {
-                        BankAccount targetBankAccount = _context.BankAccounts.FirstOrDefault(x => x.UserId == targetId && x.IBAN == targetIBAN);
-                        if (targetBankAccount != null)
+                        if (senderBankAccount.Currency == targetBankAccount.Currency)
                         {
                             if (senderBankAccount.Balance >= amount)
                             {
-                                senderBankAccount.Balance -= amount;
-                                targetBankAccount.Balance += amount;
-
-                                _context.Entry(senderBankAccount).State = EntityState.Modified;
-                                _context.Entry(targetBankAccount).State = EntityState.Modified;
-                                _context.SaveChanges();
+                                await TransferLog(senderBankAccount, targetBankAccount, explanation, senderBankAccount.Currency, amount);
 
                                 return (true, "Transfer successful");
                             }
                             return (false, "Insufficient balance");
                         }
-                        return (false, "Wrong target user");
+                        return (false, "Your account' s currency type and target account' s currency type does not match");
                     }
-                    return (false, "Wrong currency type");
+                    return (false, "You can not send money to yourself");
                 }
-                return (false, "Invalid user");
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message);
-            }
+                catch (Exception ex)
+                {
+                    return (false, ex.Message);
+                }
+            }  
         }
-        //public bool Validation(string username, string password)
-        //{
-        //    try
-        //    {
-        //        ConnectionControl();
-        //        string cmd = $"SELECT TOP (1) [ID],[UserName],[Password] FROM [InvestmentDb].[dbo].[UserTable] where [UserName]='{username}' and [Password]='{password}'";
-        //        SqlCommand command = new SqlCommand(cmd, _connection);
-        //        SqlDataReader reader = command.ExecuteReader();
-
-        //        if (reader.Read())
-        //        {
-        //            reader.Close();
-        //            return true;
-        //        }
-        //        return false;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return false;
-        //    }
-        //    finally
-        //    {
-        //        _connection.Close();
-        //    }
-        //}
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObjec
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +138,7 @@ namespace InvestmentApp
             if (user == null)
                 return null;
 
-            return user.CastUserTableToUserDto();
+            return user.CastUserTableToDto();
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable
@@ -220,49 +162,65 @@ namespace InvestmentApp
             }
             return list;
         }
-        public  Task<List<BankAccount>> GetUserBankAccounts(int id)
+        public Task<List<BankAccountDto>> GetUserBankAccounts(int id)
         {
-            return  _context.BankAccounts.Where(x => x.UserId == id).ToListAsync();
+            return _context.BankAccounts
+                .Select(x => new BankAccountDto { ID = x.ID, UserId = x.UserId, AccountName = x.AccountName, IBAN = x.IBAN, Currency = (CurrencyTypes)x.Currency, Balance = x.Balance })
+                .Where(x => x.UserId == id)
+                .ToListAsync();
         }
-        public Task<List<UserInvestment>> GetUserInvestmentLog(int id)
+        public Task<List<UserInvestmentDto>> GetUserInvestmentLog(int id)
         {
-            return _context.UserInvestments.Where(x => x.EffecterID == id).ToListAsync();
+            return _context.UserInvestments
+                .Select(x => new UserInvestmentDto { ID = x.ID, EffecterID = x.EffecterID, AffectedID = x.AffectedID, Date = x.Date, Action = (LogAction)x.Action, Explanation = x.Explanation, Currency = (CurrencyTypes)x.Currency, Amount = x.Amount })
+                .Where(x => x.EffecterID == id || x.AffectedID == id)
+                .OrderByDescending(x => x.Date)
+                .ToListAsync();
         }
-        public Task<List<Log>> GetLogTable()
+        public Task<List<LogDto>> GetLogTable()
         {
-            return _context.Logs.OrderByDescending(x => x.Date).ToListAsync();
+            return _context.Logs
+                .Select(x => new LogDto { ID = x.ID, EffecterID = x.EffecterID, AffectedID = x.AffectedID, Date = x.Date, Action = (LogAction)x.Action, Explanation = x.Explanation })
+                .OrderByDescending(x => x.Date)
+                .ToListAsync();
         }
         public Task<List<UserDto>> GetUserTable()
         {
-            return _context.UserTables.Select(x => new UserDto { ID = x.ID, Name = x.Name, Surname = x.Surname, Username = x.Username, Password = x.Password, RegisterDate = x.RegisterDate, Permission = x.Permission }).ToListAsync();
+            return _context.UserTables
+                .Select(x => new UserDto { ID = x.ID, Name = x.Name, Surname = x.Surname, Username = x.Username, Password = x.Password, RegisterDate = x.RegisterDate, Permission = (Permissions)x.Permission })
+                .ToListAsync();
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Lo
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public async void Log(LogAction action, string explanation, int? effecterID = null, int? affecterID = null)
+        public async Task Log(LogAction action, string explanation, int? effecterID = null, int? affecterID = null)
         {
-            _context.Logs.Add(new Log
+            _context.Logs.Add(new LogDto
             {
                 Action = action,
                 Explanation = explanation,
                 EffecterID = effecterID,
                 AffectedID = affecterID,
                 Date = DateTime.Now,
-            });
+            }.CastDtoTolog());
             await _context.SaveChangesAsync();
         }
-        public async void TransferLog(LogAction action, string explanation, int effecterID, int affectedID, CurrencyTypes currency, decimal amount)
+        public async Task TransferLog(BankAccountDto senderBankAccount, BankAccountDto targetBankAccount, string explanation, CurrencyTypes currency, decimal amount)
         {
-            _context.UserInvestments.Add(new UserInvestment
+            string logMessage = $"{senderBankAccount.Currency}{Convert.ToString(amount)} tranfered from {senderBankAccount.UserId} ({senderBankAccount.AccountName}) to {targetBankAccount.UserId} ({targetBankAccount.AccountName}) ===>" + Environment.NewLine + explanation;
+
+            _context.UserInvestments.Add(new UserInvestmentDto
             {
-                Action = action,
-                Explanation = explanation,
-                EffecterID = effecterID,
-                AffectedID = affectedID,
+                Action = LogAction.transfer,
+                EffecterID = senderBankAccount.UserId,
+                SenderBankAccountId = senderBankAccount.ID,
+                AffectedID = targetBankAccount.UserId,
+                TargetBankAccountId = targetBankAccount.ID,
+                Date = DateTime.Now,
+                Explanation = logMessage,
                 Currency = currency,
-                Amount = amount,
-                Date = DateTime.Now, 
-            });
+                Amount = amount 
+            }.CastDtoToUserInvestment());
             await _context.SaveChangesAsync();
         }
     }

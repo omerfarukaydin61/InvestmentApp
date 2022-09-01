@@ -17,10 +17,10 @@ namespace InvestmentApp.Forms
 {
     public partial class Invest : Form
     {
-        List<BankAccount> _bankAccounts;
+        List<BankAccountDto> _bankAccounts;
         BusinessInvest _businessInvest;
         UserDto _userModel;
-        BankAccount _userBankAccount;
+        BankAccountDto _userBankAccount;
         public Invest()
         {
             InitializeComponent();
@@ -83,13 +83,6 @@ namespace InvestmentApp.Forms
                 }
                     
                 sfdgInvestmentLogs.DataSource = userInvestments;
-                sfdgInvestmentLogs.Columns[0].Visible = false;
-                sfdgInvestmentLogs.Columns[1].Width = 60;
-                sfdgInvestmentLogs.Columns[2].Width = 60;
-                sfdgInvestmentLogs.Columns[3].Width = 80;
-                sfdgInvestmentLogs.Columns[4].Width = 65;
-                sfdgInvestmentLogs.Columns[6].Width = 40;
-                sfdgInvestmentLogs.Columns[7].Width = 60;
             }
             catch (Exception) { }
         }
@@ -97,7 +90,7 @@ namespace InvestmentApp.Forms
         {
             try
             {
-                _userBankAccount = (BankAccount)cbxUserAccounts.SelectedItem;
+                _userBankAccount = (BankAccountDto)cbxUserAccounts.SelectedItem;
 
                 if (_userBankAccount == null)
                 {
@@ -126,18 +119,14 @@ namespace InvestmentApp.Forms
         {
             SetSelectedBankAccount();
         }
-        private void cbxExType_SelectedValueChanged(object sender, EventArgs e)
-        {
-            SetTotalBalance();
-        }
         private void dgwInvestmentLogs_QueryRowStyle(object sender, QueryRowStyleEventArgs e)
         {
             if (e.RowType == RowType.DefaultRow)
             {
-                if ((e.RowData as UserInvestment).Action == LogAction.deposit)
-                    e.Style.BackColor = Color.LightGreen;
-                else if ((e.RowData as UserInvestment).Action == LogAction.withdraw)
+                if ((e.RowData as UserInvestmentDto).EffecterID == _userModel.ID)
                     e.Style.BackColor = ColorTranslator.FromHtml("#EB5656");
+                else if ((e.RowData as UserInvestmentDto).AffectedID == _userModel.ID)
+                    e.Style.BackColor = Color.LightGreen;
             }
         }
         private void sfdgRateOfExchange_QueryRowStyle(object sender, QueryRowStyleEventArgs e)
@@ -166,7 +155,7 @@ namespace InvestmentApp.Forms
         private void sfbTransfer_Click(object sender, EventArgs e)
         {
             var tranfer = new Transfer(_userModel, _bankAccounts);
-            //tranfer.Closed += (s, args) => this.Invest_Load();
+            tranfer.Closed += (s, args) => this.Invest_Load(sender, e);
             tranfer.ShowDialog();
         }
         private void Search(string key)
@@ -178,10 +167,10 @@ namespace InvestmentApp.Forms
         {
             Search(tbxSearch.Text);
         }
-        private void Invest_FormClosing(object sender, FormClosingEventArgs e)
+        private async void Invest_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //string message = USD"{ConfigModel.RegisteredUser.Name} logged out.";
-            //Logger.Log(LogAction.logout, message, ConfigModel.RegisteredUser.ID);
+            string message = $"{ConfigModel.RegisteredUser.Name} logged out.";
+            await Logger.Log(LogAction.logout, message, ConfigModel.RegisteredUser.ID);
         }
     }
 }

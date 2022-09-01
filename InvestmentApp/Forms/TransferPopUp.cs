@@ -18,9 +18,9 @@ namespace InvestmentApp.Forms
         BusinessTransfer _businessTransfer = new BusinessTransfer();
         MoneyTransferDto _moneyTransferDto;
         UserDto _senderUser;
-        List<BankAccount> _senderBankAccounts;
+        List<BankAccountDto> _senderBankAccounts;
         bool _isSetTargetBankAccountsBusy = false;
-        public TransferPopUp(MoneyTransferDto moneyTransferDto, UserDto senderUser, List<BankAccount> senderBankAccounts)
+        public TransferPopUp(MoneyTransferDto moneyTransferDto, UserDto senderUser, List<BankAccountDto> senderBankAccounts)
         {
             InitializeComponent();
             _moneyTransferDto = moneyTransferDto;
@@ -40,18 +40,18 @@ namespace InvestmentApp.Forms
             tbxAmount.CurrencySymbol = _moneyTransferDto.SenderBankAccount.Currency.ToString();
             tbxAmount.DecimalValue = _moneyTransferDto.Amount;
 
-            List<BankAccount> targerBankAccounts = await SetTargetBankAccounts(_moneyTransferDto.TargetUser, _moneyTransferDto.SenderBankAccount.Currency);
+            List<BankAccountDto> targerBankAccounts = await SetTargetBankAccounts(_moneyTransferDto.TargetUser, _moneyTransferDto.SenderBankAccount.Currency);
             sfcbxTargetBankAccounts.DataSource = targerBankAccounts;
             sfcbxSenderBankAccounts.SelectedItem = _moneyTransferDto.TargetBankAccount;
         }
-        private async Task<List<BankAccount>> SetTargetBankAccounts(UserDto targetUser, CurrencyTypes currencyType)
+        private async Task<List<BankAccountDto>> SetTargetBankAccounts(UserDto targetUser, CurrencyTypes currencyType)
         {
             try
             {
                 if (!_isSetTargetBankAccountsBusy)
                 {
                     _isSetTargetBankAccountsBusy = true;
-                    List<BankAccount> targetBankAccounts = await _businessTransfer.GetUserBankAccounts(targetUser, currencyType);
+                    List<BankAccountDto> targetBankAccounts = await _businessTransfer.GetUserBankAccounts(targetUser, currencyType);
                     if (targetBankAccounts.Count == 0)
                     {
                         sfcbxTargetBankAccounts.DataSource = null;

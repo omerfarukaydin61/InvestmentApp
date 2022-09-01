@@ -15,7 +15,6 @@ namespace InvestmentApp.Entities.Enums
         remove,
         update,
         exception,
-        deposit,
-        withdraw
+        transfer
     }
 }

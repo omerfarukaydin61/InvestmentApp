@@ -28,7 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            Syncfusion.WinForms.DataGrid.GridNumericColumn gridNumericColumn1 = new Syncfusion.WinForms.DataGrid.GridNumericColumn();
+            Syncfusion.WinForms.DataGrid.GridTextColumn gridTextColumn1 = new Syncfusion.WinForms.DataGrid.GridTextColumn();
+            Syncfusion.WinForms.DataGrid.GridTextColumn gridTextColumn2 = new Syncfusion.WinForms.DataGrid.GridTextColumn();
+            Syncfusion.WinForms.DataGrid.GridTextColumn gridTextColumn3 = new Syncfusion.WinForms.DataGrid.GridTextColumn();
+            Syncfusion.WinForms.DataGrid.GridDateTimeColumn gridDateTimeColumn1 = new Syncfusion.WinForms.DataGrid.GridDateTimeColumn();
+            Syncfusion.WinForms.DataGrid.GridTextColumn gridTextColumn4 = new Syncfusion.WinForms.DataGrid.GridTextColumn();
+            Syncfusion.WinForms.DataGrid.GridTextColumn gridTextColumn5 = new Syncfusion.WinForms.DataGrid.GridTextColumn();
+            Syncfusion.WinForms.DataGrid.GridNumericColumn gridNumericColumn2 = new Syncfusion.WinForms.DataGrid.GridNumericColumn();
+            Syncfusion.WinForms.DataGrid.GridNumericColumn gridNumericColumn3 = new Syncfusion.WinForms.DataGrid.GridNumericColumn();
+            Syncfusion.WinForms.DataGrid.GridNumericColumn gridNumericColumn4 = new Syncfusion.WinForms.DataGrid.GridNumericColumn();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tbxUserBalance = new Syncfusion.Windows.Forms.Tools.CurrencyTextBox();
             this.cbxUserAccounts = new Syncfusion.WinForms.ListView.SfComboBox();
@@ -41,9 +50,9 @@
             this.sfButton1 = new Syncfusion.WinForms.Controls.SfButton();
             this.sfdgRateOfExchange = new Syncfusion.WinForms.DataGrid.SfDataGrid();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.sfdgInvestmentLogs = new Syncfusion.WinForms.DataGrid.SfDataGrid();
             this.label1 = new System.Windows.Forms.Label();
             this.tbxSearch = new System.Windows.Forms.TextBox();
-            this.sfdgInvestmentLogs = new Syncfusion.WinForms.DataGrid.SfDataGrid();
             this.sfButton2 = new Syncfusion.WinForms.Controls.SfButton();
             this.sfbTransfer = new Syncfusion.WinForms.Controls.SfButton();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -76,7 +85,7 @@
             // 
             // tbxUserBalance
             // 
-            this.tbxUserBalance.BeforeTouchSize = new System.Drawing.Size(368, 35);
+            this.tbxUserBalance.BeforeTouchSize = new System.Drawing.Size(206, 35);
             this.tbxUserBalance.DecimalValue = new decimal(new int[] {
             0,
             0,
@@ -87,11 +96,12 @@
             this.tbxUserBalance.Name = "tbxUserBalance";
             this.tbxUserBalance.Size = new System.Drawing.Size(206, 35);
             this.tbxUserBalance.TabIndex = 39;
-            this.tbxUserBalance.Text = "USD0.00";
+            this.tbxUserBalance.Text = "$0.00";
             // 
             // cbxUserAccounts
             // 
             this.cbxUserAccounts.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.cbxUserAccounts.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.cbxUserAccounts.DisplayMember = "AccountName";
             this.cbxUserAccounts.DropDownPosition = Syncfusion.WinForms.Core.Enums.PopupRelativeAlignment.Center;
             this.cbxUserAccounts.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -110,6 +120,7 @@
             // 
             // sfcbxInvestUsers
             // 
+            this.sfcbxInvestUsers.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.sfcbxInvestUsers.BackColor = System.Drawing.Color.White;
             this.sfcbxInvestUsers.DisplayMember = "Name";
             this.sfcbxInvestUsers.DropDownPosition = Syncfusion.WinForms.Core.Enums.PopupRelativeAlignment.Center;
@@ -150,13 +161,14 @@
             // 
             // cbxExType
             // 
+            this.cbxExType.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.cbxExType.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxExType.FormattingEnabled = true;
             this.cbxExType.Location = new System.Drawing.Point(6, 59);
             this.cbxExType.Name = "cbxExType";
             this.cbxExType.Size = new System.Drawing.Size(201, 32);
             this.cbxExType.TabIndex = 27;
-            this.cbxExType.SelectedValueChanged += new System.EventHandler(this.cbxExType_SelectedValueChanged);
+            this.cbxExType.SelectedValueChanged += new System.EventHandler(this.cbxUserAccounts_SelectedValueChanged);
             // 
             // groupBox3
             // 
@@ -187,6 +199,7 @@
             this.sfButton1.Size = new System.Drawing.Size(165, 95);
             this.sfButton1.TabIndex = 36;
             this.sfButton1.Text = "CREATE NEW ACCOUNT";
+            this.sfButton1.Visible = false;
             // 
             // sfdgRateOfExchange
             // 
@@ -207,9 +220,9 @@
             this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox5.Controls.Add(this.sfdgInvestmentLogs);
             this.groupBox5.Controls.Add(this.label1);
             this.groupBox5.Controls.Add(this.tbxSearch);
-            this.groupBox5.Controls.Add(this.sfdgInvestmentLogs);
             this.groupBox5.Controls.Add(this.sfButton2);
             this.groupBox5.Controls.Add(this.sfbTransfer);
             this.groupBox5.Location = new System.Drawing.Point(1, 123);
@@ -217,6 +230,84 @@
             this.groupBox5.Size = new System.Drawing.Size(819, 546);
             this.groupBox5.TabIndex = 9;
             this.groupBox5.TabStop = false;
+            // 
+            // sfdgInvestmentLogs
+            // 
+            this.sfdgInvestmentLogs.AccessibleName = "Table";
+            this.sfdgInvestmentLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.sfdgInvestmentLogs.AutoGenerateColumns = false;
+            this.sfdgInvestmentLogs.AutoSizeColumnsMode = Syncfusion.WinForms.DataGrid.Enums.AutoSizeColumnsMode.Fill;
+            gridNumericColumn1.AllowEditing = false;
+            gridNumericColumn1.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridNumericColumn1.HeaderText = "ID";
+            gridNumericColumn1.MappingName = "ID";
+            gridNumericColumn1.Visible = false;
+            gridTextColumn1.AllowEditing = false;
+            gridTextColumn1.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridTextColumn1.HeaderText = "EffectedID";
+            gridTextColumn1.MappingName = "EffectedID";
+            gridTextColumn1.Visible = false;
+            gridTextColumn1.Width = 60D;
+            gridTextColumn2.AllowEditing = false;
+            gridTextColumn2.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridTextColumn2.HeaderText = "AffectedID";
+            gridTextColumn2.MappingName = "AffectedID";
+            gridTextColumn2.Visible = false;
+            gridTextColumn2.Width = 60D;
+            gridTextColumn3.AllowEditing = false;
+            gridTextColumn3.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridTextColumn3.HeaderText = "Action";
+            gridTextColumn3.MappingName = "Action";
+            gridTextColumn3.Width = 65D;
+            gridDateTimeColumn1.AllowEditing = false;
+            gridDateTimeColumn1.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridDateTimeColumn1.HeaderText = "Date";
+            gridDateTimeColumn1.MappingName = "Date";
+            gridDateTimeColumn1.MaxDateTime = new System.DateTime(9999, 12, 31, 23, 59, 59, 999);
+            gridDateTimeColumn1.Width = 80D;
+            gridTextColumn4.AllowEditing = false;
+            gridTextColumn4.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridTextColumn4.HeaderText = "Explanation";
+            gridTextColumn4.MappingName = "Explanation";
+            gridTextColumn5.AllowEditing = false;
+            gridTextColumn5.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridTextColumn5.HeaderText = "Currency";
+            gridTextColumn5.MappingName = "Currency";
+            gridTextColumn5.Width = 40D;
+            gridNumericColumn2.AllowEditing = false;
+            gridNumericColumn2.CellStyle.HorizontalAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            gridNumericColumn2.HeaderText = "Amount";
+            gridNumericColumn2.MappingName = "Amount";
+            gridNumericColumn2.Width = 60D;
+            gridNumericColumn3.AllowEditing = false;
+            gridNumericColumn3.HeaderText = "SenderBankAccountId";
+            gridNumericColumn3.MappingName = "SenderBankAccountId";
+            gridNumericColumn3.Visible = false;
+            gridNumericColumn4.AllowEditing = false;
+            gridNumericColumn4.HeaderText = "TargetBankAccountId";
+            gridNumericColumn4.MappingName = "TargetBankAccountId";
+            gridNumericColumn4.Visible = false;
+            this.sfdgInvestmentLogs.Columns.Add(gridNumericColumn1);
+            this.sfdgInvestmentLogs.Columns.Add(gridTextColumn1);
+            this.sfdgInvestmentLogs.Columns.Add(gridTextColumn2);
+            this.sfdgInvestmentLogs.Columns.Add(gridTextColumn3);
+            this.sfdgInvestmentLogs.Columns.Add(gridDateTimeColumn1);
+            this.sfdgInvestmentLogs.Columns.Add(gridTextColumn4);
+            this.sfdgInvestmentLogs.Columns.Add(gridTextColumn5);
+            this.sfdgInvestmentLogs.Columns.Add(gridNumericColumn2);
+            this.sfdgInvestmentLogs.Columns.Add(gridNumericColumn3);
+            this.sfdgInvestmentLogs.Columns.Add(gridNumericColumn4);
+            this.sfdgInvestmentLogs.Location = new System.Drawing.Point(96, 59);
+            this.sfdgInvestmentLogs.Name = "sfdgInvestmentLogs";
+            this.sfdgInvestmentLogs.RowHeight = 50;
+            this.sfdgInvestmentLogs.Size = new System.Drawing.Size(711, 475);
+            this.sfdgInvestmentLogs.TabIndex = 37;
+            this.sfdgInvestmentLogs.Text = "sfDataGrid2";
+            this.sfdgInvestmentLogs.ThemeName = "Office2016Black";
+            this.sfdgInvestmentLogs.AutoGeneratingColumn += new Syncfusion.WinForms.DataGrid.Events.AutoGeneratingColumnEventHandler(this.sfdgInvestmentLogs_AutoGeneratingColumn);
+            this.sfdgInvestmentLogs.QueryRowStyle += new Syncfusion.WinForms.DataGrid.Events.QueryRowStyleEventHandler(this.dgwInvestmentLogs_QueryRowStyle);
             // 
             // label1
             // 
@@ -236,22 +327,6 @@
             this.tbxSearch.TabIndex = 40;
             this.tbxSearch.TextChanged += new System.EventHandler(this.tbxSearch_TextChanged);
             // 
-            // sfdgInvestmentLogs
-            // 
-            this.sfdgInvestmentLogs.AccessibleName = "Table";
-            this.sfdgInvestmentLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.sfdgInvestmentLogs.AutoSizeColumnsMode = Syncfusion.WinForms.DataGrid.Enums.AutoSizeColumnsMode.Fill;
-            this.sfdgInvestmentLogs.Location = new System.Drawing.Point(96, 59);
-            this.sfdgInvestmentLogs.Name = "sfdgInvestmentLogs";
-            this.sfdgInvestmentLogs.Size = new System.Drawing.Size(711, 475);
-            this.sfdgInvestmentLogs.TabIndex = 37;
-            this.sfdgInvestmentLogs.Text = "sfDataGrid2";
-            this.sfdgInvestmentLogs.ThemeName = "Office2016Black";
-            this.sfdgInvestmentLogs.AutoGeneratingColumn += new Syncfusion.WinForms.DataGrid.Events.AutoGeneratingColumnEventHandler(this.sfdgInvestmentLogs_AutoGeneratingColumn);
-            this.sfdgInvestmentLogs.QueryRowStyle += new Syncfusion.WinForms.DataGrid.Events.QueryRowStyleEventHandler(this.dgwInvestmentLogs_QueryRowStyle);
-            // 
             // sfButton2
             // 
             this.sfButton2.AccessibleName = "Button";
@@ -261,6 +336,7 @@
             this.sfButton2.Size = new System.Drawing.Size(84, 69);
             this.sfButton2.TabIndex = 39;
             this.sfButton2.Text = "BANK";
+            this.sfButton2.Visible = false;
             // 
             // sfbTransfer
             // 
@@ -290,10 +366,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(193)))), ((int)(((byte)(233)))));
             this.ClientSize = new System.Drawing.Size(1165, 669);
+            this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.sfButton1);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.groupBox5);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.Name = "Invest";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -320,7 +396,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox tbxTotal;
-        private System.Windows.Forms.ComboBox cbxExType;
         private Syncfusion.WinForms.DataGrid.SfDataGrid sfdgRateOfExchange;
         private System.Windows.Forms.TextBox tbxIBAN;
         private System.Windows.Forms.GroupBox groupBox3;
@@ -335,5 +410,6 @@
         private Syncfusion.Windows.Forms.Tools.CurrencyTextBox tbxUserBalance;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tbxSearch;
+        private System.Windows.Forms.ComboBox cbxExType;
     }
 }

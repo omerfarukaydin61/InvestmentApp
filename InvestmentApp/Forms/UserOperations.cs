@@ -34,6 +34,7 @@ namespace InvestmentApp.Forms
             sfdgUserOperations.Columns[4].Visible = false;
             sfdgUserOperations.Columns[5].Visible = false;
             sfdgUserOperations.SelectionMode = GridSelectionMode.Single;
+            sfdgUserOperations.AllowEditing = false;
         }
         private void btnAdd_Click(object sender, EventArgs e)
         {

@@ -15,21 +15,26 @@ namespace InvestmentApp.Business
         {
             _repository = new Repository();
         }
-        public async Task<List<BankAccount>> GetUserBankAccounts(UserDto targetUser, CurrencyTypes CurrencyType)
+        public async Task<List<BankAccountDto>> GetUserBankAccounts(UserDto targetUser, CurrencyTypes CurrencyType)
         {
             if (targetUser == null)
                 return null;
 
-            List<BankAccount> targetBankAccounts = await _repository.GetUserBankAccounts(targetUser.ID);
+            List<BankAccountDto> targetBankAccounts = await _repository.GetUserBankAccounts(targetUser.ID);
             return targetBankAccounts.Where(x => x.Currency == CurrencyType).ToList();
         }
-        public Task<List<BankAccount>> GetUserBankAccounts(int senderUserID)
+        public Task<List<BankAccountDto>> GetUserBankAccounts(int senderUserID)
         {
             return _repository.GetUserBankAccounts(senderUserID);
         }
         public Task<List<UserDto>> GetUserTable()
         {
             return _repository.GetUserTable();
+        }
+        public async Task<(bool, string)> Transfer(BankAccountDto senderBankAccount, BankAccountDto targetBankAccount, string explanation, decimal amount)
+        {
+            (bool isTransfered, string msg) = await _repository.Transfer(senderBankAccount, targetBankAccount, explanation, amount);
+            return (isTransfered, msg);
         }
     }
 }

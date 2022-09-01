@@ -18,7 +18,7 @@ namespace InvestmentApp.Forms
         public Login()
         {
             InitializeComponent();
-            //HorizontallyCenterElement();
+            HorizontallyCenterElement();
         }
         private void btnLogin_Click(object sender, EventArgs e)
         {
@@ -40,7 +40,7 @@ namespace InvestmentApp.Forms
                 {
                     tbxUsername.Focus();
                     lblUsename.ForeColor = Color.Red;
-                    lblUsename.ForeColor = System.Drawing.Color.Red;
+                    lblUsename.ForeColor = Color.Red;
                 }
             }
         }
@@ -56,7 +56,7 @@ namespace InvestmentApp.Forms
                 {
                     tbxPassword.Focus();
                     lblPassword.ForeColor = Color.Red;
-                    lblPassword.ForeColor = System.Drawing.Color.Red;
+                    lblPassword.ForeColor = Color.Red;
                 }
             }
         }
@@ -67,12 +67,12 @@ namespace InvestmentApp.Forms
                 UserLogin(tbxUsername.Text, tbxPassword.Text);
             }
         }
-        private void UserLogin(string Username, string Password)
+        private async void UserLogin(string Username, string Password)
         {
-            if (_repository.Login(Username, Password))
+            if (await _repository.Login(Username, Password))
             {
                 string message = ($"{ConfigModel.RegisteredUser.Name} logged in.");
-                Logger.Log(LogAction.login, message, ConfigModel.RegisteredUser.ID);
+                await Logger.Log(LogAction.login, message, ConfigModel.RegisteredUser.ID);
                 this.Hide();
                 var home = new Home();
                 home.Closed += (s, args) => this.Close();
@@ -96,19 +96,16 @@ namespace InvestmentApp.Forms
                 RegisterDate = DateTime.Now,
                 Permission = Permissions.Admin
             };
-            this.Hide();
-            var home = new Home();
-            home.Closed += (s, args) => this.Close();
-            home.Show();
+            UserLogin("admin", "00");
         }
 
-        //private void HorizontallyCenterElement()
-        //{
-        //    tbxUsername.Left = (tbxUsername.Parent.Width - tbxUsername.Width) / 2;
-        //    tbxPassword.Left = (tbxPassword.Parent.Width - tbxUsername.Width) / 2;
-        //    lblPassword.Left = (lblPassword.Parent.Width - lblPassword.Width) / 2;
-        //    lblUsename.Left = (lblUsename.Parent.Width - lblUsename.Width) / 2;
-        //    btnLogin.Left = (btnLogin.Parent.Width - btnLogin.Width) / 2;
-        //}
+        private void HorizontallyCenterElement()
+        {
+            tbxUsername.Left = (tbxUsername.Parent.Width - tbxUsername.Width) / 2;
+            tbxPassword.Left = (tbxPassword.Parent.Width - tbxUsername.Width) / 2;
+            lblPassword.Left = (lblPassword.Parent.Width - lblPassword.Width) / 2;
+            lblUsename.Left = (lblUsename.Parent.Width - lblUsename.Width) / 2;
+            btnLogin.Left = (btnLogin.Parent.Width - btnLogin.Width) / 2;
+        }
     }
 }

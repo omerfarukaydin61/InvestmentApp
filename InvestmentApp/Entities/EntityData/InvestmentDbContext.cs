@@ -3,18 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Linq;
 
-namespace InvestmentApp.Entities.Classes
+namespace InvestmentApp.Entities.EntityData
 {
     public partial class InvestmentDbContext : DbContext
     {
         public InvestmentDbContext()
-            : base("name=InvestmentDbContext")
+            : base("name=InvestmentDbContext1")
         {
         }
 
         public virtual DbSet<BankAccount> BankAccounts { get; set; }
         public virtual DbSet<Log> Logs { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<UserInvestment> UserInvestments { get; set; }
         public virtual DbSet<UserTable> UserTables { get; set; }
 
