@@ -15,6 +15,10 @@ namespace InvestmentApp.Entities.Enums
         remove,
         update,
         exception,
-        transfer
+        transfer,
+        backTransfer,
+        transferDelete,
+        income,
+        outgo
     }
 }

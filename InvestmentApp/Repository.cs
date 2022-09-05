@@ -128,6 +128,23 @@ namespace InvestmentApp
                 }
             }  
         }
+        public async Task<(bool, string)> BackTransfer(UserInvestmentDto userInvestmentDto)
+        {
+            using (InvestmentDbContext context = new InvestmentDbContext())
+            {
+                try
+                {
+                    var entity = context.Entry(userInvestmentDto.CastDtoToUserInvestment());
+                    entity.State = EntityState.Modified;
+                    await context.SaveChangesAsync();
+                    return (true, "Process completed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    return (false, ex.Message);
+                }
+            }
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObjec
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,8 +189,8 @@ namespace InvestmentApp
         public Task<List<UserInvestmentDto>> GetUserInvestmentLog(int id)
         {
             return _context.UserInvestments
-                .Select(x => new UserInvestmentDto { ID = x.ID, EffecterID = x.EffecterID, AffectedID = x.AffectedID, Date = x.Date, Action = (LogAction)x.Action, Explanation = x.Explanation, Currency = (CurrencyTypes)x.Currency, Amount = x.Amount })
-                .Where(x => x.EffecterID == id || x.AffectedID == id)
+                .Select(x => new UserInvestmentDto { ID = x.ID, EffecterID = x.EffecterID, AffectedID = x.AffectedID, Date = x.Date, Action = (LogAction)x.Action, Explanation = x.Explanation, Currency = (CurrencyTypes)x.Currency, Amount = x.Amount, SenderBankAccountId = x.SenderBankAccountId, TargetBankAccountId = x.TargetBankAccountId })
+                .Where(x => (x.EffecterID == id || x.AffectedID == id) && x.Action != LogAction.transferDelete)
                 .OrderByDescending(x => x.Date)
                 .ToListAsync();
         }

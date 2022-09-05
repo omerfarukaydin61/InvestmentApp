@@ -38,7 +38,7 @@
             // 
             // tbxUsername
             // 
-            this.tbxUsername.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.tbxUsername.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tbxUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F);
             this.tbxUsername.ForeColor = System.Drawing.Color.Black;
             this.tbxUsername.Location = new System.Drawing.Point(306, 89);
@@ -50,7 +50,7 @@
             // 
             // tbxPassword
             // 
-            this.tbxPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.tbxPassword.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tbxPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F);
             this.tbxPassword.Location = new System.Drawing.Point(306, 155);
             this.tbxPassword.Name = "tbxPassword";
@@ -62,7 +62,7 @@
             // 
             // lblUsename
             // 
-            this.lblUsename.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblUsename.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lblUsename.AutoSize = true;
             this.lblUsename.Location = new System.Drawing.Point(367, 73);
             this.lblUsename.Name = "lblUsename";
@@ -72,7 +72,7 @@
             // 
             // lblPassword
             // 
-            this.lblPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblPassword.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lblPassword.AutoSize = true;
             this.lblPassword.Location = new System.Drawing.Point(368, 139);
             this.lblPassword.Name = "lblPassword";
@@ -82,7 +82,7 @@
             // 
             // btnLogin
             // 
-            this.btnLogin.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnLogin.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.ForeColor = System.Drawing.Color.Black;
@@ -104,9 +104,9 @@
             this.btnAdmin.Cursor = System.Windows.Forms.Cursors.AppStarting;
             this.btnAdmin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdmin.ForeColor = System.Drawing.Color.White;
-            this.btnAdmin.Location = new System.Drawing.Point(6, 4);
+            this.btnAdmin.Location = new System.Drawing.Point(0, 0);
             this.btnAdmin.Name = "btnAdmin";
-            this.btnAdmin.Size = new System.Drawing.Size(790, 444);
+            this.btnAdmin.Size = new System.Drawing.Size(800, 450);
             this.btnAdmin.TabIndex = 5;
             this.btnAdmin.UseVisualStyleBackColor = true;
             this.btnAdmin.Click += new System.EventHandler(this.btnAdmin_Click);
@@ -122,9 +122,11 @@
             this.Controls.Add(this.tbxPassword);
             this.Controls.Add(this.tbxUsername);
             this.Controls.Add(this.btnAdmin);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";
+            this.FontChanged += new System.EventHandler(this.Login_FontChanged);
             this.ResumeLayout(false);
             this.PerformLayout();
 

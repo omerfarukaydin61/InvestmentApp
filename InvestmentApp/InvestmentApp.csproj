@@ -101,6 +101,8 @@
     <Compile Include="AsyncHelper.cs" />
     <Compile Include="Business\BusinessInvest.cs" />
     <Compile Include="Business\BusinessTransfer.cs" />
+    <Compile Include="Entities\ConfigForm.cs" />
+    <Compile Include="Entities\ConfigValidation.cs" />
     <Compile Include="Entities\CurrencyModel.cs" />
     <Compile Include="Entities\ConfigModel.cs" />
     <Compile Include="Entities\Dto\BankAccountDto.cs" />
@@ -136,17 +138,23 @@
     <Compile Include="Forms\Login.Designer.cs">
       <DependentUpon>Login.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Investment_App.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Investment_App.Designer.cs">
+      <DependentUpon>Investment_App.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PasswordValidation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PasswordValidation.Designer.cs">
+      <DependentUpon>PasswordValidation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Transfer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Transfer.Designer.cs">
       <DependentUpon>Transfer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\TransferPopUp.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\TransferPopUp.Designer.cs">
-      <DependentUpon>TransferPopUp.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\UserOperationsPopUp.cs">
       <SubType>Form</SubType>
@@ -161,7 +169,6 @@
       <DependentUpon>UserOperations.cs</DependentUpon>
     </Compile>
     <Compile Include="GetMbCurrency.cs" />
-    <Compile Include="IBANGenerator.cs" />
     <Compile Include="Entities\Logger.cs" />
     <Compile Include="MbCurrencyTemplate.cs" />
     <Compile Include="Program.cs" />
@@ -181,11 +188,14 @@
     <EmbeddedResource Include="Forms\Login.resx">
       <DependentUpon>Login.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Investment_App.resx">
+      <DependentUpon>Investment_App.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PasswordValidation.resx">
+      <DependentUpon>PasswordValidation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Transfer.resx">
       <DependentUpon>Transfer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TransferPopUp.resx">
-      <DependentUpon>TransferPopUp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UserOperationsPopUp.resx">
       <DependentUpon>UserOperationsPopUp.cs</DependentUpon>
@@ -236,6 +246,26 @@
   <ItemGroup>
     <None Include="Resources\Transfer.jpg" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\arrow-up-from-bracket.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\square-chevron-left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\square-chevron-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Abdülhamid Sad %28Sadbulhamid%29.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sadbulhamid.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\house.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\right-from-bracket.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

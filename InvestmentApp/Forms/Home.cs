@@ -19,52 +19,52 @@ namespace InvestmentApp.Forms
         public Home()
         {
             InitializeComponent();
+            ConfigForm.CurrentForm = this;
+            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
         }
-
         private  void Home_Load(object sender, EventArgs e)
         {
             LoadProducts();
         }
-
         private async void LoadProducts()
         {
             sfdgHome.DataSource = await _repository.GetLogTable();
-            sfdgHome.Columns[0].Visible = false;
-            sfdgHome.Columns[1].Width = 60;
-            sfdgHome.Columns[2].Width = 60;
-            sfdgHome.Columns[3].Width = 120;
-            sfdgHome.Columns[4].Width = 75;
         }
-
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             LoadProducts();
         }
-
         private void btnUserOperations_Click(object sender, EventArgs e)
         {
-            var userOperations = new UserOperations();
-            userOperations.Closed += (s, args) => this.LoadProducts();
-            userOperations.ShowDialog();
+            if (ConfigForm.OpenedForms.Any(x => x.Text == "UserOperations"))
+            {
+                ConfigForm.OpenedForms.FirstOrDefault(x => x.Text == "UserOperations").BringToFront();
+            }
+            else
+            {
+                UserOperations userOperations = new UserOperations();
+                userOperations.TopLevel = false;
+                Investment_App._mother.Controls.Add(userOperations);
+                userOperations.BringToFront();
+                userOperations.Dock = DockStyle.Fill;
+                userOperations.Show();
+            } 
         }
-
-        private void Home_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            //string message = USD"{ConfigModel.RegisteredUser.Name} logged out.";
-            //Logger.Log(LogAction.logout, message, ConfigModel.RegisteredUser.ID);
-        }
-
         private void btnInvest_Click(object sender, EventArgs e)
         {
-            var invest = new Invest();
-            invest.Closed += (s, args) => this.LoadProducts();
-            invest.ShowDialog();
-        }
-
-        private void sfdgHome_AutoGeneratingColumn(object sender, Syncfusion.WinForms.DataGrid.Events.AutoGeneratingColumnArgs e)
-        {
-            e.Column.CellStyle.VerticalAlignment = VerticalAlignment.Center;
-            e.Column.CellStyle.HorizontalAlignment = HorizontalAlignment.Center;
+            if (ConfigForm.OpenedForms.Any(x => x.Text == "Invest"))
+            {
+                ConfigForm.OpenedForms.FirstOrDefault(x => x.Text == "Invest").BringToFront();
+            }
+            else
+            {
+                Invest invest = new Invest();
+                invest.TopLevel = false;
+                Investment_App._mother.Controls.Add(invest);
+                invest.BringToFront();
+                invest.Dock = DockStyle.Fill;
+                invest.Show();
+            }
         }
         private void Search(string key)
         {
@@ -74,6 +74,22 @@ namespace InvestmentApp.Forms
         private void tbxSearch_TextChanged(object sender, EventArgs e)
         {
             Search(tbxSearch.Text);
+        }
+        private async void Home_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                if (ConfigModel.RegisteredUser != null)
+                {
+                    string message = $"{ConfigModel.RegisteredUser.Name} logged out.";
+                    await Logger.Log(LogAction.logout, message, ConfigModel.RegisteredUser.ID);
+                }
+            }
+            catch (Exception) { }
+        }
+        private void Home_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ConfigForm.RemoveSpecificForm(this);
         }
     }
 }

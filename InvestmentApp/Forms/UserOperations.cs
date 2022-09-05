@@ -23,6 +23,8 @@ namespace InvestmentApp.Forms
         public UserOperations()
         {
             InitializeComponent();
+            ConfigForm.CurrentForm = this;
+            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
         }
         private void UserOperations_Load(object sender, EventArgs e)
         {
@@ -31,10 +33,7 @@ namespace InvestmentApp.Forms
         private async void LoadProducts()
         {
             sfdgUserOperations.DataSource = await _repository.GetUserTable();
-            sfdgUserOperations.Columns[4].Visible = false;
-            sfdgUserOperations.Columns[5].Visible = false;
             sfdgUserOperations.SelectionMode = GridSelectionMode.Single;
-            sfdgUserOperations.AllowEditing = false;
         }
         private void btnAdd_Click(object sender, EventArgs e)
         {
@@ -89,6 +88,10 @@ namespace InvestmentApp.Forms
         private void tbxSearch_TextChanged(object sender, EventArgs e)
         {
             Search(tbxSearch.Text);
+        }
+        private void UserOperations_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ConfigForm.RemoveSpecificForm(this);
         }
     }
 }

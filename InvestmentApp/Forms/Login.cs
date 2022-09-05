@@ -9,16 +9,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Media;
 
 namespace InvestmentApp.Forms
 {
     public partial class Login : Form
     {
         Repository _repository = new Repository();
+        SoundPlayer _soundPlayer = new SoundPlayer(Properties.Resources.sadbulhamid);
         public Login()
         {
             InitializeComponent();
             HorizontallyCenterElement();
+            //ConfigForm.CurrentForm = this;
+            //this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
+            //_soundPlayer.Play();
         }
         private void btnLogin_Click(object sender, EventArgs e)
         {
@@ -73,32 +78,24 @@ namespace InvestmentApp.Forms
             {
                 string message = ($"{ConfigModel.RegisteredUser.Name} logged in.");
                 await Logger.Log(LogAction.login, message, ConfigModel.RegisteredUser.ID);
-                this.Hide();
-                var home = new Home();
-                home.Closed += (s, args) => this.Close();
-                home.Show();
+                //_soundPlayer.Stop();
+                Home form = new Home();
+                form.TopLevel = false;
+                Investment_App._mother.Controls.Add(form);
+                form.BringToFront();
+                form.Dock = DockStyle.Fill;
+                form.Show();
+                this.Close();
             }
             else
             {
                 MessageBox.Show("Access denied");
             }
         }
-
         private void btnAdmin_Click(object sender, EventArgs e)
         {
-            ConfigModel.RegisteredUser = new Entities.Classes.UserDto
-            {
-                ID = 1018,
-                Name = "omerfaruk",
-                Surname = "aydin",
-                Username = "admin",
-                Password = "00",
-                RegisterDate = DateTime.Now,
-                Permission = Permissions.Admin
-            };
             UserLogin("admin", "00");
         }
-
         private void HorizontallyCenterElement()
         {
             tbxUsername.Left = (tbxUsername.Parent.Width - tbxUsername.Width) / 2;
@@ -106,6 +103,10 @@ namespace InvestmentApp.Forms
             lblPassword.Left = (lblPassword.Parent.Width - lblPassword.Width) / 2;
             lblUsename.Left = (lblUsename.Parent.Width - lblUsename.Width) / 2;
             btnLogin.Left = (btnLogin.Parent.Width - btnLogin.Width) / 2;
+        }
+        private void Login_FontChanged(object sender, EventArgs e)
+        {
+            ConfigForm.RemoveSpecificForm(this);
         }
     }
 }

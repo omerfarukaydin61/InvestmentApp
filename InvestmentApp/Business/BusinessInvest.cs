@@ -29,13 +29,33 @@ namespace InvestmentApp.Business
         {
             return _repository.GetUserBankAccounts(id);
         }
-        public Task<List<UserInvestmentDto>> GetUserInvestmentLog(int id)
+        public async Task<List<UserInvestmentDto>> GetUserInvestmentLog(int id)
         {
-            return _repository.GetUserInvestmentLog(id);
+            var list =await _repository.GetUserInvestmentLog(id);
+            foreach (UserInvestmentDto item in list)
+            {
+                if (item.Action == LogAction.transfer)
+                {
+                    if (item.EffecterID == id)
+                    {
+                        item.Action = LogAction.outgo;
+                    }
+                    else if (item.AffectedID == id)
+                    {
+                        item.Action = LogAction.income;
+                    }
+                }
+            }
+            return list;
         }
         public Task<UserDto> GetUserFromID(int id)
         {
             return _repository.GetUserFromID(id);
+        }
+        public async Task<(bool, string)> BackTransfer(UserInvestmentDto userInvestmentDto)
+        {
+            (bool isBackTrasfered, string msg) = await _repository.BackTransfer(userInvestmentDto);
+            return (isBackTrasfered, msg);
         }
         public decimal CalculateExchange(CurrencyTypes hand, CurrencyTypes to, decimal amount)
         {

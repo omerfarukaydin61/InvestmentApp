@@ -24,6 +24,8 @@ namespace InvestmentApp.Forms
         public Invest()
         {
             InitializeComponent();
+            ConfigForm.CurrentForm = this;
+            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
             _businessInvest = new BusinessInvest();
         }
         private async void Invest_Load(object sender, EventArgs e)
@@ -32,6 +34,10 @@ namespace InvestmentApp.Forms
             sfcbxInvestUsers.SelectedValue = ConfigModel.RegisteredUser.ID;
             sfdgRateOfExchange.DataSource = _businessInvest.GetCurrencies();
             cbxExType.DataSource = Enum.GetValues(typeof(CurrencyTypes));
+            if (ConfigModel.RegisteredUser.Permission != Permissions.Admin)
+            {
+                sfcbxInvestUsers.Enabled = false;
+            }
         }
         private async Task LoadUserTable()
         {
@@ -123,10 +129,12 @@ namespace InvestmentApp.Forms
         {
             if (e.RowType == RowType.DefaultRow)
             {
-                if ((e.RowData as UserInvestmentDto).EffecterID == _userModel.ID)
+                if ((e.RowData as UserInvestmentDto).Action == LogAction.outgo)
                     e.Style.BackColor = ColorTranslator.FromHtml("#EB5656");
-                else if ((e.RowData as UserInvestmentDto).AffectedID == _userModel.ID)
+                else if ((e.RowData as UserInvestmentDto).Action == LogAction.income)
                     e.Style.BackColor = Color.LightGreen;
+                else if ((e.RowData as UserInvestmentDto).Action == LogAction.backTransfer)
+                    e.Style.BackColor = ColorTranslator.FromHtml("#DED943");
             }
         }
         private void sfdgRateOfExchange_QueryRowStyle(object sender, QueryRowStyleEventArgs e)
@@ -139,11 +147,6 @@ namespace InvestmentApp.Forms
                     e.Style.BackColor = Color.AliceBlue;
             }
         }
-        private void sfdgInvestmentLogs_AutoGeneratingColumn(object sender, AutoGeneratingColumnArgs e)
-        {
-            e.Column.CellStyle.VerticalAlignment = VerticalAlignment.Center;
-            e.Column.CellStyle.HorizontalAlignment = HorizontalAlignment.Center;
-        }
         private void tbxIBAN_MouseClick(object sender, MouseEventArgs e)
         {
             try
@@ -152,11 +155,22 @@ namespace InvestmentApp.Forms
             }
             catch (Exception) { }
         }
-        private void sfbTransfer_Click(object sender, EventArgs e)
+        private void sfbtnDeposit_Click(object sender, EventArgs e)
         {
-            var tranfer = new Transfer(_userModel, _bankAccounts);
-            tranfer.Closed += (s, args) => this.Invest_Load(sender, e);
-            tranfer.ShowDialog();
+            if (ConfigForm.OpenedForms.Any(x => x.Text == "Transfer"))
+            {
+                ConfigForm.OpenedForms.FirstOrDefault(x => x.Text == "Transfer").BringToFront();
+            }
+            else
+            {
+                Transfer tranfer = new Transfer(_userModel, _bankAccounts);
+                tranfer.TopLevel = false;
+                Investment_App._mother.Controls.Add(tranfer);
+                tranfer.BringToFront();
+                tranfer.Dock = DockStyle.Fill;
+                tranfer.Closed += (s, args) => this.Invest_Load(sender, e);
+                tranfer.Show();
+            }  
         }
         private void Search(string key)
         {
@@ -171,6 +185,84 @@ namespace InvestmentApp.Forms
         {
             string message = $"{ConfigModel.RegisteredUser.Name} logged out.";
             await Logger.Log(LogAction.logout, message, ConfigModel.RegisteredUser.ID);
+        }
+        private async void sfbtnWithdraw_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var selectedItem = sfdgInvestmentLogs.SelectedItem as UserInvestmentDto;
+                if (selectedItem.Action == LogAction.outgo)
+                {
+                    var dialogResult = MessageBox.Show($"Are you sure about cancel this transaction\n" +
+                                                       $"{selectedItem.Explanation}","CANCELLATION REQUEST" ,MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        selectedItem.Action = LogAction.backTransfer;
+                        (bool isBackTransfered, string msg) = await _businessInvest.BackTransfer(selectedItem);
+                        if (isBackTransfered)
+                        {
+                            await SetBankAccounts();
+                            MessageBox.Show(msg);
+                            return;
+                        }
+                        else
+                        {
+                            MessageBox.Show(msg);
+                            return;
+                        }
+                    }
+                }
+                MessageBox.Show("You can not cancel this transaction.");
+                return;
+            }
+            catch (Exception) { }
+        }
+        private async void sfdgInvestmentLogs_CellDoubleClick(object sender, CellClickEventArgs e)
+        {
+            try
+            {
+                var selectedItem = sfdgInvestmentLogs.SelectedItem as UserInvestmentDto;
+                if (selectedItem.Action == LogAction.backTransfer)
+                {
+                    var dialogResult = MessageBox.Show($"Are you sure about delete this BACKTRANSFERED transaction\n" +
+                                                       $"{selectedItem.Action}\n" +
+                                                       $"{selectedItem.Explanation}", "DELETE REQUEST", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        this.Enabled = false;
+                        PasswordValidation passwordValidation = new PasswordValidation(LogAction.transferDelete);
+                        passwordValidation.Closed += (s, args) => this.Invest_Load(sender, e);
+                        passwordValidation.ShowDialog();
+                        if (ConfigValidation.isValid == true)
+                        {
+                            selectedItem.Action = LogAction.transferDelete;
+                            (bool isBackTransfered, string msg) = await _businessInvest.BackTransfer(selectedItem);
+                            if (isBackTransfered)
+                            {
+                                MessageBox.Show(msg);
+                                return;
+                            }
+                            else
+                            {
+                                MessageBox.Show(msg);
+                                return;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+            catch (Exception) { }
+            finally 
+            {
+                this.Enabled = true;
+                ConfigValidation.isValid = false;
+                await LoadLogs();
+            }
+        }
+        private void Invest_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ConfigForm.RemoveSpecificForm(this);
         }
     }
 }

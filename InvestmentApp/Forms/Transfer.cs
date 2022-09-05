@@ -1,4 +1,5 @@
 ﻿using InvestmentApp.Business;
+using InvestmentApp.Entities;
 using InvestmentApp.Entities.Classes;
 using InvestmentApp.Entities.Enums;
 using Syncfusion.WinForms.DataGrid;
@@ -34,6 +35,8 @@ namespace InvestmentApp.Forms
         public Transfer(UserDto senderUser, List<BankAccountDto> senderBankAccounts)
         {
             InitializeComponent();
+            ConfigForm.CurrentForm = this;
+            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
             _senderUser = senderUser;
             _senderBankAccounts = senderBankAccounts.ToList();
             _businessTransfer = new BusinessTransfer();
@@ -167,9 +170,9 @@ namespace InvestmentApp.Forms
                     if (selectedItem == null)
                         return;
                     if ((sfcbxSenderBankAccounts.SelectedItem as BankAccountDto)?.ID != selectedItem.SenderBankAccount.ID)
-                    {
+                    {   
                         sfcbxSenderBankAccounts.SelectedItem = selectedItem.SenderBankAccount;
-                    }
+                    }   
 
                     await isWait();
 
@@ -210,11 +213,6 @@ namespace InvestmentApp.Forms
             {
                 await Task.Delay(100);
             }
-        }
-        private void sfdgSenderBankAccounts_AutoGeneratingColumn(object sender, Syncfusion.WinForms.DataGrid.Events.AutoGeneratingColumnArgs e)
-        {
-            e.Column.CellStyle.VerticalAlignment = VerticalAlignment.Center;
-            e.Column.CellStyle.HorizontalAlignment = HorizontalAlignment.Center;
         }
         private void sfdgSenderBankAccounts_QueryRowStyle(object sender, Syncfusion.WinForms.DataGrid.Events.QueryRowStyleEventArgs e)
         {
@@ -270,7 +268,13 @@ namespace InvestmentApp.Forms
             if (willBeDeleteItem == null)
                 return;
 
-            var dialogResult = MessageBox.Show($"Do you want to delete this transaction: {willBeDeleteItem.Amount}", "DELETE OPERATION", MessageBoxButtons.YesNoCancel);
+            var dialogResult = MessageBox.Show($"Do you want to delete this transaction:\n" +
+                $"{willBeDeleteItem.CurrencyType} {willBeDeleteItem.Amount}\n" +
+                $"will be transfered from\n" +
+                $"{willBeDeleteItem.SenderUser.Name}\n" +
+                $"to\n" +
+                $"{willBeDeleteItem.TargetUser.Name}.", 
+                "DELETE OPERATION", MessageBoxButtons.YesNoCancel);
 
             if (dialogResult != DialogResult.Yes)
                 return;
@@ -304,6 +308,11 @@ namespace InvestmentApp.Forms
                     e.Style.BackColor = ColorTranslator.FromHtml("#E74C3C");
             }
         }
+        private void sfdgSenderBankAccounts_AutoGeneratingColumn(object sender, Syncfusion.WinForms.DataGrid.Events.AutoGeneratingColumnArgs e)
+        {
+            e.Column.CellStyle.VerticalAlignment = VerticalAlignment.Center;
+            e.Column.CellStyle.HorizontalAlignment = HorizontalAlignment.Center;
+        }
         private void Search(string key)
         {
             sfdgMoneyTransferOperations.SearchController.AllowFiltering = true;
@@ -327,11 +336,25 @@ namespace InvestmentApp.Forms
                     else
                     {
                         mtoDto.Status = 0;
-                        MessageBox.Show(msg);
+                        var dialogResult = MessageBox.Show($"{msg}" +
+                                        $"\nfor\n" +
+                                        $"{mtoDto.CurrencyType} {mtoDto.Amount}\n" +
+                                        $"will be transfered from\n" +
+                                        $"{mtoDto.SenderUser.Name}\n" +
+                                        $"to\n" +
+                                        $"{mtoDto.TargetUser.Name}.",
+                                        "DELETE OPERATION", MessageBoxButtons.OKCancel);
+
+                        if (dialogResult == DialogResult.Cancel)
+                            return;
                     }
                     sfdgMto_Load();
                 }
             }
+        }
+        private void Transfer_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ConfigForm.RemoveSpecificForm(this);
         }
     }
 }
