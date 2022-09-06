@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InvestmentApp.Entities.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,12 +8,10 @@ using System.Windows.Forms;
 
 namespace InvestmentApp.Entities
 {
-    public static class ConfigForm 
+    public static class ConfigForm
     {
-        private static Form _currentForm;
-        private static Form _previousForm;
-        private static Form _nextForm;
-        public static Form CurrentForm
+        private static BGYForm _currentForm { get; set; }
+        public static BGYForm CurrentForm
         {
             get
             {
@@ -20,37 +19,39 @@ namespace InvestmentApp.Entities
             }
             set
             {
-                if (!OpenedForms.Any(x => x.Text == value.Text))
+                if (!OpenedForms.Any(x => x.PageType == value.PageType))
+                {
+                    if (value.PageType == Pages.UserOperations)
+                    {
+                        for (int i = OpenedForms.Count - 1; i > 0; i--)
+                        {
+                            var xxx = OpenedForms[i];
+                            if (!(OpenedForms[i]?.PageType == Pages.UserOperations || OpenedForms[i]?.PageType == Pages.Home))
+                            {
+                                RemoveSpecificForm(OpenedForms[i]);
+                            }
+                        }
+                    }
+                    if (value.PageType == Pages.Invest)
+                    {
+                        for (int i = OpenedForms.Count - 1; i > 0 ; i--)
+                        {
+                            var xxx = OpenedForms[i];
+                            if (OpenedForms[i]?.PageType != Pages.Invest || OpenedForms[i]?.PageType != Pages.Home)
+                            {
+                                RemoveSpecificForm(OpenedForms[i]);
+                            }
+                        }
+                    }
                     OpenedForms.Add(value);
-                PreviousForm = _currentForm;
+                }
+                //PageIds.Add(value.PageType);
                 _currentForm = value;
             }
         }
-        public static Form PreviousForm
-        {
-            get
-            {
-                return _previousForm;
-            }
-            set
-            {
-                _nextForm = _currentForm;
-                _currentForm = _previousForm;
-                _previousForm = value;
-            }
-        }
-        public static List<Form> OpenedForms = new List<Form>();
-        public static int MaxIdOfOpenedForm()
-        {
-            int max = -1;
-            foreach (Form f in OpenedForms)
-            {
-                if (Convert.ToInt32(f.Tag) > max)
-                    max = Convert.ToInt32(f.Tag);
-            }
-            return max;
-        }
-        public static void RemoveSpecificForm(Form form)
+        private static List<Pages> PageIds = new List<Pages>();
+        public static List<BGYForm> OpenedForms = new List<BGYForm>();
+        public static void RemoveSpecificForm(BGYForm form)
         {
             for (int i = 0; i < OpenedForms.Count; i++)
             {
@@ -63,46 +64,48 @@ namespace InvestmentApp.Entities
         }
         public static void CloseAllOpenedForms()
         {
-            _currentForm?.Close();
-            _currentForm = null;
-
-            _previousForm?.Close();
-            _previousForm = null;
-
-            _nextForm?.Close();
-            _nextForm = null;
-
             for (int i = 0; i < OpenedForms.Count; i++)
             {
+                OpenedForms[i].Close();
                 OpenedForms.Remove(OpenedForms[i]);
             }
         }
         public static void GoBackPreviousForm()
         {
-            PreviousForm?.BringToFront();
+            if (CurrentForm == null)
+                return;
+
+            int index = -1;
             for (int i = 0; i < OpenedForms.Count; i++)
             {
-                var form = OpenedForms[i];
-                if (form.Text == PreviousForm?.Text)
+                if (OpenedForms[i].Text == CurrentForm.Text)
                 {
-                    if (i - 1 >= 0)
-                        PreviousForm = OpenedForms[i - 1];
-                    return;
+                    index = i - 1;
                 }
+            }
+            if (index != -1)
+            {
+                CurrentForm = OpenedForms[index];
+                CurrentForm.BringToFront();
             }
         }
         public static void GoToNextForm()
         {
-            _nextForm?.BringToFront();
+            if (CurrentForm == null)
+                return;
+
+            int index = -1;
             for (int i = 0; i < OpenedForms.Count; i++)
             {
-                var form = OpenedForms[i];
-                if (form.Text == _nextForm?.Text)
+                if (OpenedForms[i].Text == CurrentForm.Text)
                 {
-                    if (i < OpenedForms.Count - 1)
-                        _nextForm = OpenedForms[i + 1];
-                    return;
+                    index = i + 1;
                 }
+            }
+            if (index <= OpenedForms.Count - 1)
+            {
+                CurrentForm = OpenedForms[index];
+                CurrentForm.BringToFront();
             }
         }
     }

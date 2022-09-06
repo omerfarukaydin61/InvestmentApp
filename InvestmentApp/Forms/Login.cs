@@ -13,7 +13,7 @@ using System.Media;
 
 namespace InvestmentApp.Forms
 {
-    public partial class Login : Form
+    public partial class Login : BGYForm
     {
         Repository _repository = new Repository();
         SoundPlayer _soundPlayer = new SoundPlayer(Properties.Resources.sadbulhamid);
@@ -22,7 +22,6 @@ namespace InvestmentApp.Forms
             InitializeComponent();
             HorizontallyCenterElement();
             //ConfigForm.CurrentForm = this;
-            //this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
             //_soundPlayer.Play();
         }
         private void btnLogin_Click(object sender, EventArgs e)

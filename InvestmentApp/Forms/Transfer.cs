@@ -18,7 +18,7 @@ using System.Windows.Forms.VisualStyles;
 
 namespace InvestmentApp.Forms
 {
-    public partial class Transfer : Form
+    public partial class Transfer : BGYForm
     {
         BankAccountDto _senderSelectedBankAccount;
         UserDto _targetSelectedUser;
@@ -35,8 +35,8 @@ namespace InvestmentApp.Forms
         public Transfer(UserDto senderUser, List<BankAccountDto> senderBankAccounts)
         {
             InitializeComponent();
+            PageType = Pages.Transfer;
             ConfigForm.CurrentForm = this;
-            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
             _senderUser = senderUser;
             _senderBankAccounts = senderBankAccounts.ToList();
             _businessTransfer = new BusinessTransfer();

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace InvestmentApp.Forms
 {
-    public partial class Invest : Form
+    public partial class Invest : BGYForm
     {
         List<BankAccountDto> _bankAccounts;
         BusinessInvest _businessInvest;
@@ -24,8 +24,8 @@ namespace InvestmentApp.Forms
         public Invest()
         {
             InitializeComponent();
+            PageType = Pages.Invest;
             ConfigForm.CurrentForm = this;
-            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
             _businessInvest = new BusinessInvest();
         }
         private async void Invest_Load(object sender, EventArgs e)

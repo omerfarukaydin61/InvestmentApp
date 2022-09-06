@@ -17,14 +17,14 @@ using System.Windows.Forms.VisualStyles;
 
 namespace InvestmentApp.Forms
 {
-    public partial class UserOperations : Form
+    public partial class UserOperations : BGYForm
     {
         Repository _repository = new Repository();
         public UserOperations()
         {
             InitializeComponent();
+            PageType = Pages.UserOperations;
             ConfigForm.CurrentForm = this;
-            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
         }
         private void UserOperations_Load(object sender, EventArgs e)
         {

@@ -118,6 +118,7 @@
     <Compile Include="Entities\Enums\CurrencyTypes.cs" />
     <Compile Include="Entities\Enums\LogActionType.cs" />
     <Compile Include="Entities\Enums\OperationTypes.cs" />
+    <Compile Include="Entities\Enums\Pages.cs" />
     <Compile Include="Entities\Enums\Permissions.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Forms\Home.cs">
@@ -170,6 +171,12 @@
     </Compile>
     <Compile Include="GetMbCurrency.cs" />
     <Compile Include="Entities\Logger.cs" />
+    <Compile Include="BGYForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BGYForm.Designer.cs">
+      <DependentUpon>BGYForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MbCurrencyTemplate.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

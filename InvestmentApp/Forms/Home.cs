@@ -13,14 +13,14 @@ using System.Windows.Forms.VisualStyles;
 
 namespace InvestmentApp.Forms
 {
-    public partial class Home : Form
+    public partial class Home : BGYForm
     {
         Repository _repository = new Repository();
         public Home()
         {
             InitializeComponent();
+            PageType = Pages.Home;
             ConfigForm.CurrentForm = this;
-            this.Tag = ConfigForm.MaxIdOfOpenedForm() + 1;
         }
         private  void Home_Load(object sender, EventArgs e)
         {
