@@ -1,0 +1,543 @@
+
+https://hybin.hakyazilim.com/ijepaxuhav.coffeescript
+
+using InvestmentApp.Entities;
+using InvestmentApp.Entities.Classes;
+using InvestmentApp.Entities.Enums;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InvestmentApp
+{
+    public class Repository
+    {
+        // connection
+        SqlConnection _connection = new SqlConnection(@"server=(localdb)\mssqllocaldb;initial catalog=InvestmentDb;integrated security=true");
+
+        private void ConnectionControl()
+        {
+            // Eger connection kapaliysa ac
+            if (_connection.State == ConnectionState.Closed)
+            {
+                _connection.Open();
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();GetBool();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public bool Login(string username, string password)
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = $"SELECT TOP (1) [ID],[Name],[Surname],[UserName],[Password],[RegisterDate],[Permission] FROM [InvestmentDb].[dbo].[UserTable] where [UserName]='{username}' and [Password]='{password}'";
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    UserModel user = new UserModel
+                    {
+                        ID = Convert.ToInt32(reader["ID"]),
+                        Name = reader["Name"].ToString(),
+                        Surname = reader["Surname"].ToString(),
+                        UserName = reader["UserName"].ToString(),
+                        Password = reader["Password"].ToString(),
+                        RegisterDate = Convert.ToDateTime(reader["RegisterDate"]),
+                        Permission = Convert.ToInt32(reader["Permission"])
+
+                    };
+                    ConfigModel.RegisteredUser = user;
+                    reader.Close();
+                    return true;
+                }
+                reader.Close();
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        public bool Add(UserModel user)
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd0 = $"SELECT TOP (1) [ID] FROM [InvestmentDb].[dbo].[UserTable] where [UserName]='{user.UserName}'";
+                SqlCommand command0 = new SqlCommand(cmd0, _connection);
+                SqlDataReader reader0 = command0.ExecuteReader();
+                if (!reader0.HasRows)
+                {
+                    reader0.Close();
+                    string cmd = $"INSERT INTO UserTable VALUES('{user.Name}', '{user.Surname}', '{user.UserName}', '{user.Password}', '{user.RegisterDate}', {user.Permission})";
+                    SqlCommand command = new SqlCommand(cmd, _connection);
+
+                    command.ExecuteNonQuery();
+                    return true;
+                }
+                else
+                {
+                    reader0.Close();
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+        }
+
+        public bool Delete(int id)
+        {
+            try
+            {
+                ConnectionControl();
+                if (ConfigModel.RegisteredUser.ID != id)
+                {
+                    string cmd = $"DELETE FROM UserTable WHERE ID = {id}";
+                    SqlCommand command = new SqlCommand(cmd, _connection);
+                    command.ExecuteNonQuery();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        public bool Update(UserModel user)
+        {
+            try
+            {
+                ConnectionControl();
+                SqlCommand command = new SqlCommand(
+                $"UPDATE UserTable SET Name='{user.Name}', Surname='{user.Surname}', UserName='{user.UserName}', Password='{user.Password}', Permission='{user.Permission}' WHERE ID={user.ID}", _connection);
+                command.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        public (bool, string) Transfer(int senderId, string senderIBAN, string targetName, string targetIBAN, CurrencyTypes currencyType, decimal amount)
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd0 = $"SELECT [UserId],[AccountName],[IBAN],[Currency],[Balance] FROM [InvestmentDb].[dbo].[BankAccounts] where [UserId]=@senderId and [IBAN]=@senderIBAN";
+                SqlCommand command0 = new SqlCommand(cmd0, _connection);
+                command0.Parameters.AddWithValue("@senderId", senderId);
+                command0.Parameters.AddWithValue("@senderIBAN", senderIBAN);
+                SqlDataReader reader0 = command0.ExecuteReader();
+                if (reader0.Read())
+                {
+                    UserBankAccountModel senderAccount = new UserBankAccountModel
+                    {
+                        ID = Convert.ToInt32(reader0["UserId"]),
+                        AccountName = Convert.ToString(reader0["AccountName"]),
+                        IBAN = Convert.ToString(reader0["IBAN"]),
+                        CurrencyType = (CurrencyTypes)Convert.ToInt32(reader0["Currency"]),
+                        Balance = Convert.ToDecimal(reader0["Balance"])
+                    };
+                    reader0.Close();
+                    if (senderAccount.CurrencyType == currencyType)
+                    {
+                        string cmd1 = $"SELECT [UserId],[AccountName],[IBAN],[Currency],[Balance] FROM [InvestmentDb].[dbo].[BankAccounts] where [IBAN]='{targetIBAN}'";
+                        SqlCommand command1 = new SqlCommand(cmd1, _connection);
+                        //command1.Parameters.AddWithValue("@targetIBAN", targetIBAN);
+                        SqlDataReader reader1 = command1.ExecuteReader();
+                        if (reader1.Read())
+                        {
+                            UserBankAccountModel targetAccount = new UserBankAccountModel
+                            {
+                                ID = Convert.ToInt32(reader1["UserId"]),
+                                AccountName = Convert.ToString(reader1["AccountName"]),
+                                IBAN = Convert.ToString(reader1["IBAN"]),
+                                CurrencyType = (CurrencyTypes)Convert.ToInt32(reader1["Currency"]),
+                                Balance = Convert.ToDecimal(reader1["Balance"])
+                            };
+                            reader1.Close();
+                            UserModel targetuser = GetUserFromID(targetAccount.ID);
+                            ConnectionControl();
+                            if (targetuser.Name == targetName)
+                            {                               
+                                if (senderAccount.Balance >= amount)
+                                {
+                                    senderAccount.Balance -= amount;
+                                    targetAccount.Balance += amount;
+                                    string cmd2 = $"UPDATE BankAccounts SET Balance={senderAccount.Balance} WHERE IBAN='{senderAccount.IBAN}'" + Environment.NewLine +
+                                        $"UPDATE BankAccounts SET Balance={targetAccount.Balance} WHERE IBAN='{targetAccount.IBAN}'";
+                                    SqlCommand command2 = new SqlCommand(cmd2, _connection);
+                                    command2.ExecuteNonQuery();
+                                    return (true, (string)"Transfer successful");
+                                }
+                                return (false, (string)"Insufficient balance");
+                            }
+                            return (false, (string)"Wrong target name");
+                        }
+                        return (false, (string)"Wrong target IBAN");
+                    }
+                    return (false, (string)"Wrong currency type");
+                }
+                return (false, (string)"Invalid user");
+            }
+            catch (Exception ex)
+            {
+                string xxx = Convert.ToString(ex);
+                return (false, (string)xxx);
+            }
+        }
+
+        public bool Validation(string username, string password)
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = $"SELECT TOP (1) [ID],[UserName],[Password] FROM [InvestmentDb].[dbo].[UserTable] where [UserName]='{username}' and [Password]='{password}'";
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    reader.Close();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();GetObject();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public UserModel GetUserFromID(int id)
+        {
+            ConnectionControl();
+            string cmd = $"SELECT TOP (1) [ID],[Name],[Surname],[UserName],[Password],[RegisterDate],[Permission] FROM [InvestmentDb].[dbo].[UserTable] where [ID]={id}";
+            SqlCommand command = new SqlCommand(cmd, _connection);
+            SqlDataReader reader = command.ExecuteReader();
+            reader.Read();
+            UserModel user = new UserModel
+            {
+                ID = Convert.ToInt32(reader["ID"]),
+                Name = reader["Name"].ToString(),
+                Surname = reader["Surname"].ToString(),
+                UserName = reader["UserName"].ToString(),
+                Password = reader["Password"].ToString(),
+                RegisterDate = Convert.ToDateTime(reader["RegisterDate"]),
+                Permission = Convert.ToInt32(reader["Permission"])
+            };
+
+            reader.Close();
+            _connection.Close();
+            return user;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();GetTable();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public List<CurrencyModel> GetCurrencyTable()
+        {
+            ConnectionControl();
+            MBData mBData = GetMbCurrency.PriceList;
+            List<CurrencyModel> list = new List<CurrencyModel>();
+            foreach (var currency in mBData.Currencies)
+            {
+                CurrencyModel currencyModel = new CurrencyModel
+                {
+                    CurrencyCode = currency.CurrencyName,
+                    BanknoteBuying = currency.BanknoteBuying,
+                    BanknoteSelling = currency.BanknoteSelling,
+                };
+                if (currencyModel.BanknoteBuying != "" || currencyModel.BanknoteSelling != "")
+                {
+                    list.Add(currencyModel);
+                }
+            }
+            _connection.Close();
+            return list;
+        }
+        public List<UserBankAccountModel> GetUserBalance(int id)
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = $"SELECT [UserId],[AccountName],[IBAN],[Currency],[Balance]FROM[InvestmentDb].[dbo].[BankAccounts] where [UserId]=@id";
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                command.Parameters.AddWithValue("@id", id);
+                SqlDataReader reader = command.ExecuteReader();
+                List<UserBankAccountModel> UserBankAccounts = new List<UserBankAccountModel>();
+                while (reader.Read())
+                {
+                    UserBankAccountModel account = new UserBankAccountModel();
+                    //balance.USD = Convert.ToDecimal(reader["USD"]) == null ? 0 : reader["USD"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["USD"]);
+                    account.ID = Convert.ToInt32(reader["UserId"]);
+                    account.AccountName = Convert.ToString(reader["AccountName"]);
+                    account.IBAN = Convert.ToString(reader["IBAN"]);
+                    account.CurrencyType = (CurrencyTypes)Convert.ToInt32(reader["Currency"]);
+                    account.Balance = Convert.ToDecimal(reader["Balance"]);
+                    UserBankAccounts.Add(account);
+                }
+                reader.Close();
+                return UserBankAccounts;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        public List<UserInvestLogModel> GetUserInvestmentLog(int id)
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = $"SELECT [EffecterID],[AffectedID],[Currency],[Amount],[Date],[Explanation],[Type] FROM [InvestmentDb].[dbo].[UserInvestments] WHERE [EffecterID]=@id";
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                command.Parameters.AddWithValue("@id", id);
+                SqlDataReader reader = command.ExecuteReader();
+                List<UserInvestLogModel> UserInvestmentLogs = new List<UserInvestLogModel>();
+                while (reader.Read())
+                {
+                    UserInvestLogModel investLog = new UserInvestLogModel();
+                    investLog.EffecterID = Convert.ToInt32(reader["EffecterID"]);
+                    investLog.AffectedID = Convert.ToInt32(reader["AffectedID"]);
+                    investLog.Currency = (CurrencyTypes)Convert.ToInt32(reader["Currency"]);
+                    investLog.Amount = Convert.ToDecimal(reader["Amount"]);
+                    investLog.Date = Convert.ToDateTime(reader["Date"]);
+                    investLog.Explanation = reader["Explanation"].ToString();
+                    investLog.Type = (LogAction)Convert.ToInt32(reader["Type"]);
+                    UserInvestmentLogs.Add(investLog);
+                }
+                reader.Close();
+                return UserInvestmentLogs;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+        }
+
+        public List<HomePageLogModel> GetLogTable()
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = "SELECT [EffecterID],[AffectedID],[Date],[Action],[LogMessage]FROM[InvestmentDb].[dbo].[Logs]";
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                SqlDataReader reader = command.ExecuteReader();
+                List<HomePageLogModel> HomeLogs = new List<HomePageLogModel>();
+                while (reader.Read())
+                {
+                    HomePageLogModel log = new HomePageLogModel();
+                    {
+                        if (reader["EffecterID"] != null && reader["EffecterID"] != DBNull.Value)
+                        {
+                            log.Effecter = Convert.ToInt32(reader["EffecterID"]);
+                        }
+                        if (reader["AffectedID"] != null && reader["AffectedID"] != DBNull.Value)
+                        {
+                            log.Affected = Convert.ToInt32(reader["AffectedID"]);
+                        }
+                        log.LogDate = Convert.ToDateTime(reader["Date"]);
+                        log.LogActionType = (LogAction)Convert.ToInt32(reader["Action"]);
+                        log.LogMessage = Convert.ToString(reader["LogMessage"]);
+                        HomeLogs.Add(log);
+                    }
+                }
+                reader.Close();
+                return HomeLogs;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        public List<HomePageUserModel> GetUserOperationsPageUsersTable()
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = "SELECT [UserTable].[ID],[UserTable].[Name],[UserTable].[Surname]," +
+                    "[UserTable].[RegisterDate], [UserTable].[Permission] FROM[InvestmentDb].[dbo].[UserTable] ";
+
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                SqlDataReader reader = command.ExecuteReader();
+                List<HomePageUserModel> HomeUsers = new List<HomePageUserModel>();
+                while (reader.Read())
+                {
+                    HomePageUserModel user = new HomePageUserModel();
+                    user.ID = Convert.ToInt32(reader["ID"]);
+                    user.Name = reader["Name"].ToString();
+                    user.Surname = reader["Surname"].ToString();
+                    user.RegisterDate = Convert.ToDateTime(reader["RegisterDate"]);
+                    user.Permission = (Permissions)Convert.ToInt32(reader["Permission"]);
+                    HomeUsers.Add(user);
+                }
+                reader.Close();
+                return HomeUsers;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+        }
+
+        public List<DeletePageUserModel> DeletePageUserTable()
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = "SELECT [UserTable].[ID],[UserTable].[Name],[UserTable].[Surname]," +
+                    "[UserTable].[UserName], [UserTable].[Password] " +
+                    "FROM[InvestmentDb].[dbo].[UserTable]";
+
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                SqlDataReader reader = command.ExecuteReader();
+                List<DeletePageUserModel> DeletePageUsers = new List<DeletePageUserModel>();
+                while (reader.Read())
+                {
+                    DeletePageUserModel user = new DeletePageUserModel();
+                    user.ID = Convert.ToInt32(reader["ID"]);
+                    user.Name = reader["Name"].ToString();
+                    user.Surname = reader["Surname"].ToString();
+                    user.Username = reader["UserName"].ToString();
+                    user.Password = reader["Password"].ToString();
+
+                    DeletePageUsers.Add(user);
+                }
+                reader.Close();
+                return DeletePageUsers;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();Log();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void Log(LogAction action, string message, int effecterID = 0, int affecterID = 0)
+        {
+            ConnectionControl();
+            string cmd = "INSERT INTO Logs VALUES (@Effecter, @Affected, @Date, @Action, @Message)";
+            SqlCommand command = new SqlCommand(cmd, _connection);
+            if (effecterID != 0)
+            {
+                command.Parameters.AddWithValue("@Effecter", effecterID);
+            }
+            else
+            {
+                command.Parameters.AddWithValue("@Effecter", DBNull.Value);
+            }
+            if (affecterID != 0)
+            {
+                command.Parameters.AddWithValue("@Affected", affecterID);
+            }
+            else
+            {
+                command.Parameters.AddWithValue("@Affected", DBNull.Value);
+            }
+
+            command.Parameters.AddWithValue("@Date", DateTime.Now);
+            command.Parameters.AddWithValue("@Action", action);
+            command.Parameters.AddWithValue("@Message", message.ToString());
+            command.ExecuteNonQuery();
+            _connection.Close();
+        }
+
+        public bool TransferLog(int effecterID, int affectedID, CurrencyTypes currency, decimal amount, DateTime date, string explanation, LogAction type)
+        {
+            try
+            {
+                ConnectionControl();
+                string cmd = "INSERT INTO UserInvestments VALUES (@EffecterID, @AffectedID, @Currency, @Amount, @Date, @Explanation, @Type)";
+                SqlCommand command = new SqlCommand(cmd, _connection);
+                command.Parameters.AddWithValue("@EffecterID", effecterID);
+                command.Parameters.AddWithValue("@AffectedID", affectedID);
+                command.Parameters.AddWithValue("@Currency", currency);
+                command.Parameters.AddWithValue("@Amount", amount);
+                command.Parameters.AddWithValue("@Date", date);
+                command.Parameters.AddWithValue("@Explanation", explanation);
+                command.Parameters.AddWithValue("@Type", type);
+                command.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+    }
+}
