@@ -10,7 +10,7 @@ namespace InvestmentApp.Entities
 {
     public static class ConfigForm
     {
-        private static BGYForm _currentForm { get; set; }
+        public static BGYForm _currentForm { get; set; }
         public static BGYForm CurrentForm
         {
             get
@@ -45,7 +45,7 @@ namespace InvestmentApp.Entities
                     }
                     OpenedForms.Add(value);
                 }
-                //PageIds.Add(value.PageType);
+                PageIds.Add(value.PageType);
                 _currentForm = value;
             }
         }
@@ -72,7 +72,7 @@ namespace InvestmentApp.Entities
         }
         public static void GoBackPreviousForm()
         {
-            if (CurrentForm == null)
+            if (CurrentForm == null || CurrentForm.PageType == Pages.Login)
                 return;
 
             int index = -1;
@@ -91,7 +91,7 @@ namespace InvestmentApp.Entities
         }
         public static void GoToNextForm()
         {
-            if (CurrentForm == null)
+            if (CurrentForm == null || CurrentForm.PageType == Pages.Login)
                 return;
 
             int index = -1;

@@ -21,8 +21,8 @@ namespace InvestmentApp.Forms
         {
             InitializeComponent();
             HorizontallyCenterElement();
-            //ConfigForm.CurrentForm = this;
-            //_soundPlayer.Play();
+            ConfigForm.CurrentForm = this;
+            _soundPlayer.Play();
         }
         private void btnLogin_Click(object sender, EventArgs e)
         {
@@ -84,7 +84,6 @@ namespace InvestmentApp.Forms
                 form.BringToFront();
                 form.Dock = DockStyle.Fill;
                 form.Show();
-                this.Close();
             }
             else
             {

@@ -14,6 +14,7 @@ namespace InvestmentApp.Forms
 {
     public partial class Investment_App : Form, IMessageFilter
     {
+        Login login = new Login();
         public static Investment_App _mother;
         private const int WM_XBUTTONDOWN = 0x020B;
         private const int MK_XBUTTON1 = 0x0020;
@@ -47,7 +48,7 @@ namespace InvestmentApp.Forms
         }
         private void MDIParent1_Load(object sender, EventArgs e)
         {
-            Login login = new Login();
+            
             login.TopLevel = false;
             _mother.Controls.Add(login);
             login.Dock = DockStyle.Fill;
@@ -75,17 +76,26 @@ namespace InvestmentApp.Forms
         }
         private void tsbtnExit_Click(object sender, EventArgs e)
         {
+            if (ConfigForm.CurrentForm.PageType == Pages.Login)
+            {
+                return;
+            }
+            ConfigForm.OpenedForms.Clear();
             ConfigForm.CloseAllOpenedForms();
+            ConfigForm._currentForm.Close();
 
-            ConfigModel.RegisteredUser = null;
-            Login login = new Login();
             login.TopLevel = false;
             _mother.Controls.Add(login);
             login.Dock = DockStyle.Fill;
-            login.Show();
+            login.BringToFront();
+            ConfigForm.CurrentForm = login;
         }
         private void tsbtnHome_Click(object sender, EventArgs e)
         {
+            if (ConfigForm.CurrentForm.PageType == Pages.Login)
+            {
+                return;
+            }
             if (ConfigForm.OpenedForms.Any(x => x.Text == "Home"))
             {
                 var xxx = ConfigForm.OpenedForms.FirstOrDefault(x => x.Text == "Home");
